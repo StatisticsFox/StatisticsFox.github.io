@@ -1,8 +1,8 @@
 module.exports = {
-  title: `zoomkoding.com`,
-  description: `줌코딩의 개발일기`,
+  title: `StatisticsFox.com`,
+  description: `지혁이의 데엔일기`,
   language: `ko`, // `ko`, `en` => currently support versions for Korean and English
-  siteUrl: `https://www.zoomkoding.com`,
+  siteUrl: `https://www.StatisticsFox.com`,
   ogImage: `/og-image.png`, // Path to your in the 'static' folder
   comments: {
     utterances: {
@@ -11,16 +11,16 @@ module.exports = {
   },
   ga: '0', // Google Analytics Tracking ID
   author: {
-    name: `정진혁`,
+    name: `최지혁`,
     bio: {
-      role: `개발자`,
-      description: ['사람에 가치를 두는', '능동적으로 일하는', '이로운 것을 만드는'],
-      thumbnail: 'sample.png', // Path to the image in the 'asset' folder
+      role: `엔지니어`,
+      description: ['깨달음의 재미를 아는', '공유에 가치를 두는', '개방과 수용을 중시하는'],
+      thumbnail: 'Fox.png', // Path to the image in the 'asset' folder
     },
     social: {
-      github: ``, // `https://github.com/zoomKoding`,
-      linkedIn: ``, // `https://www.linkedin.com/in/jinhyeok-jeong-800871192`,
-      email: ``, // `zoomkoding@gmail.com`,
+      github: ``, // `https://github.com/StatisticsFox`,
+      linkedIn: ``, // `https://www.linkedin.com/in/jeehyuk-choi/`,
+      email: ``, // `akfktl328@gmail.com`,
     },
   },
 
@@ -43,12 +43,25 @@ module.exports = {
       // ========================================================
       // ========================================================
       {
-        date: '2021.02 ~',
-        activity: '개인 블로그 개발 및 운영',
+        date: '2024.01 ~ now',
+        activity: 'B.O.A.Z 🐘 (Data engineering study club)',
         links: {
-          post: '/gatsby-starter-zoomkoding-introduction',
-          github: 'https://github.com/zoomkoding/zoomkoding-gatsby-blog',
-          demo: 'https://www.zoomkoding.com',
+          github: 'https://github.com/BOAZ-bigdata',
+          demo: 'https://cafe.naver.com/boazbigdata',
+        },
+        date: '2023.11 ~ now',
+        activity: '글또 9기 (A writing group of developers)',
+        links: {
+        },
+        date: '2023.06 ~ 2024.02',
+        activity: 'Fast campus corporate education DX team \n   In charge of data analysis training for Samsung Electronics employees',
+        links: {
+        },
+        date: '2022.03 ~ 2023.07',
+        activity: 'D.N.A (Data And Analysis study club)',
+        links: {
+          github: 'https://github.com/Data-N-Analysis',
+          demo: 'https://cafe.naver.com/kyonggidna',
         },
       },
     ],
@@ -72,15 +85,15 @@ module.exports = {
       // ========================================================
       // ========================================================
       {
-        title: '개발 블로그 테마 개발',
+        title: '2023 경남 공공데이터 활용 아이디어 경진대회',
         description:
-          '개발 블로그를 운영하는 기간이 조금씩 늘어나고 점점 많은 생각과 경험이 블로그에 쌓아가면서 제 이야기를 담고 있는 블로그를 직접 만들어보고 싶게 되었습니다. 그동안 여러 개발 블로그를 보면서 좋았던 부분과 불편했던 부분들을 바탕으로 레퍼런스를 참고하여 직접 블로그 테마를 만들게 되었습니다.',
-        techStack: ['gatsby', 'react'],
-        thumbnailUrl: 'blog.png',
+          '경상남도 의료소외지역 발굴을 위해 전통적 회귀분석기법과 머신러닝 기술을 혼합하여 의료소외지수를 생성했습니다. 생성한 지수를 기준으로 의료소외지역을 선정하여 대시보드를 제작했습니다. ',
+        techStack: ['python', 'R', 'Tableau'],
+        thumbnailUrl: 'gyeongnam.png',
         links: {
-          post: '/gatsby-starter-zoomkoding-introduction',
-          github: 'https://github.com/zoomkoding/zoomkoding-gatsby-blog',
-          demo: 'https://www.zoomkoding.com',
+          github: 'https://github.com/StatisticsFox/2023_Gyeongnam_Public_Data_Utilization_Idea_Competition',
+          demo: 'https://public.tableau.com/app/profile/.26001199/viz/_16889018879440/1_2',
+          
         },
       },
     ],
