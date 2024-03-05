@@ -49,14 +49,20 @@ module.exports = {
           github: 'https://github.com/BOAZ-bigdata',
           demo: 'https://cafe.naver.com/boazbigdata',
         },
+      },
+        {
         date: '2023.11 ~ now',
         activity: '글또 9기 (A writing group of developers)',
         links: {
         },
+      },
+        {
         date: '2023.06 ~ 2024.02',
         activity: 'Fast campus corporate education DX team \n   In charge of data analysis training for Samsung Electronics employees',
         links: {
         },
+      },
+        {
         date: '2022.03 ~ 2023.07',
         activity: 'D.N.A (Data And Analysis study club)',
         links: {
