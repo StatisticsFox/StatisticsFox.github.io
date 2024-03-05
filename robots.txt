@@ -1,3 +1,3 @@
 User-agent: *
-Sitemap: https://www.statisticsfox.com/sitemap/sitemap-index.xml
-Host: https://www.statisticsfox.com
+Sitemap: https://statisticsfox.github.io/sitemap/sitemap-index.xml
+Host: https://statisticsfox.github.io
