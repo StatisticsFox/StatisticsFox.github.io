@@ -4,7 +4,7 @@ title: 뭐? Mongo DB가 가용성을 보장하지 않는다고?
 date: '2024-02-18 18:18:21'
 author: 최지혁
 tags: CAP
-categories: Book Report
+categories: DB
 ---
 제목을 보면 이게 무슨 소리인가 싶을 수 있다. 나도 처음 듣고 띠요옹? 했었다.
 
@@ -28,7 +28,7 @@ CAP 이론은 2000년에 에릭 브류어가 최초로 소개한 이론이며 �
 -   **availability**: 분산 시스템에 접속하는 클라이언트는 일부 노드에서 장애가 발생하더라도 항상 응답을 받을 수 있어야 한다.
 -   **partition** **tolerance**: 파티션은 두 노드 사이에 통신 장애가 발생하였음을 의미한다. 파티션 감내는 네트워크에 파티션이 생기더라도 시스템은 계속해서 동작하여야 한다는 것을 의미한다.
 
-![CAP이론(https://velog.velcdn.com/images/ragi/post/b733e648-935c-41d5-8ca7-818da0c7be4f/image.png)
+![CAP이론](https://velog.velcdn.com/images/ragi/post/b733e648-935c-41d5-8ca7-818da0c7be4f/image.png)
 
 즉 모두 만족할 수 없기에 CA, CP, AP로 구분되는데 P 즉 파티션 감내를 보장하기 위해서는 네트워크 장애가 절대 발생하면 안 된다는 가정이 필요하다. 그러나 **통상 네트워크 장애는 피할 수 없다.** 때문에 분산 시스템은 반드시 파티션 문제를 감내할 수 있도록 설계해야 하므로 실세계에서 **CA시스템은 존재하지 않는다**.
 
