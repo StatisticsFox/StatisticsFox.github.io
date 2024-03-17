@@ -56,6 +56,12 @@ module.exports = {
         links: {
         },
       },
+      {
+        date: '2023.11 ~ now',
+        activity: '개인 블로그 운영 StatisticsFox',
+        links: {
+        },
+      },
         {
         date: '2023.06 ~ 2024.02',
         activity: 'Fast campus corporate education DX team \n   In charge of data analysis training for Samsung Electronics employees',
