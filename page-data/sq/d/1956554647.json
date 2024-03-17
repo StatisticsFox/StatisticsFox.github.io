@@ -1,1 +1,1 @@
-{"data":{"allMarkdownRemark":{"edges":[{"node":{"frontmatter":{"title":"쉽고 빠르게 나만의 개츠비(Gatsby) 블로그 만들기","categories":"블로그 featured"},"fields":{"slug":"/gatsby-starter-zoomkoding-introduction/"}}}]}}}
+{"data":{"allMarkdownRemark":{"edges":[{"node":{"frontmatter":{"title":"뭐? Mongo DB가 가용성을 보장하지 않는다고?","categories":"Book Report"},"fields":{"slug":"/Book Report/"}}},{"node":{"frontmatter":{"title":"쉽고 빠르게 나만의 개츠비(Gatsby) 블로그 만들기","categories":"블로그 featured"},"fields":{"slug":"/gatsby-starter-zoomkoding-introduction/"}}}]}}}
