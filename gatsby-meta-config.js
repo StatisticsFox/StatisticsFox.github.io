@@ -18,9 +18,9 @@ module.exports = {
       thumbnail: 'Fox.png', // Path to the image in the 'asset' folder
     },
     social: {
-      github: ``, // `https://github.com/StatisticsFox`,
-      linkedIn: ``, // `https://www.linkedin.com/in/jeehyuk-choi/`,
-      email: ``, // `akfktl328@gmail.com`,
+      github: `https://github.com/StatisticsFox`, // `https://github.com/StatisticsFox`,
+      linkedIn: `https://www.linkedin.com/in/jeehyuk-choi/`, // `https://www.linkedin.com/in/jeehyuk-choi/`,
+      email: `akfktl328@gmail.com`, // `akfktl328@gmail.com`,
     },
   },
 
