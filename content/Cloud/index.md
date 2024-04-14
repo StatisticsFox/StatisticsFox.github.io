@@ -46,9 +46,9 @@ NAT Instance는 EC2 Instance를 NAT용으로 바꿔 사용하는 것을 말한�
 > 인스턴스를 재시작해도 public IP가 변경되지 않도록 고정된 public IP를 제공하는 서비스를 말함.
 
 
-**NAT Instance**: 퍼블릭 서브넷 기능이 있는 하나의 EC2 서버다. 때문에 꺼지면 죽으며 위 구성도 처럼 단일 서버로 구축하기 때문에 SPOF가 될 수 있다. 토이 프로젝트에서만 사용하도록 하자ㅎㅎ
+✅<font color="#c00000">**NAT Instance**</font>: 퍼블릭 서브넷 기능이 있는 하나의 EC2 서버다. 때문에 꺼지면 죽으며 위 구성도 처럼 단일 서버로 구축하기 때문에 SPOF가 될 수 있다. 토이 프로젝트에서만 사용하도록 하자ㅎㅎ
 
-**NAT Gateway**: AWS에서 제공하는 서비스이기에 고가용성이 보장되서 죽지 않는다. SPOF라는 단점을 해결할 수 있다.
+✅<font color="#c00000">**NAT Gateway**</font>: AWS에서 제공하는 서비스이기에 고가용성이 보장되서 죽지 않는다. SPOF라는 단점을 해결할 수 있다.
 
 
 | **NAT Instance**         | **NAT Gateway**           |
@@ -58,4 +58,6 @@ NAT Instance는 EC2 Instance를 NAT용으로 바꿔 사용하는 것을 말한�
 | 서버가 꺼지면 죽음               | 꺼져도 죽지 않음 병렬로 구성(고가용성 보장) |
 | 보안그룹에 영향을 받기에 일일이 설정해야 함 | 보안 그룸 영향 받지 않음            |
 | Bastion을 겸할 수O           | Bastion을 겸할 수X            |
+
+
 이제 NAT INSTANCE를 구성하는 방법은 다음 포스팅에서 다뤄보도록 하겠다.
