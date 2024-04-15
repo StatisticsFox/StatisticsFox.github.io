@@ -1,7 +1,7 @@
 ---
 emoji: 🐕
 title: AWS NAT instance를 활용한 비용절약
-date: '2024-01-14 21:24:21'
+date: '2024-04-14 21:24:21'
 author: 최지혁
 tags: AWS, NAT
 categories: Cloud
