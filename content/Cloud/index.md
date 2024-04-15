@@ -63,3 +63,5 @@ NAT Instance는 EC2 Instance를 NAT용으로 바꿔 사용하는 것을 말한�
 
 <br/>
 이제 NAT INSTANCE를 구성하는 방법은 다음 포스팅에서 다뤄보도록 하겠다.
+
+# NAT INSTANCE를 구성 방법
