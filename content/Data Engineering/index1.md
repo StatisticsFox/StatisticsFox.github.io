@@ -4,7 +4,7 @@ title: 뭐? Mongo DB가 가용성을 보장하지 않는다고?
 date: '2024-02-18 18:18:21'
 author: 최지혁
 tags: CAP
-categories: DB
+categories: Data_Engineering
 ---
 제목을 보면 이게 무슨 소리인가 싶을 수 있다. 나도 처음 듣고 띠요옹? 했었다.
 
