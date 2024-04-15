@@ -67,7 +67,6 @@
       }
     })
   </script><link rel="preload" as="font" type="font/woff2" crossorigin="anonymous" href="/static/webfonts/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fBBc4.woff2"/><link rel="preload" as="font" type="font/woff2" crossorigin="anonymous" href="/static/webfonts/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2"/><link rel="preload" as="font" type="font/woff2" crossorigin="anonymous" href="/static/webfonts/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fBBc4.woff2"/><style>@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:300;src:url(/static/webfonts/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fBBc4.woff2) format("woff2")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:400;src:url(/static/webfonts/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2) format("woff2")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:500;src:url(/static/webfonts/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fBBc4.woff2) format("woff2")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:300;src:url(/static/webfonts/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fBBc-.woff) format("woff")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:400;src:url(/static/webfonts/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxM.woff) format("woff")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:500;src:url(/static/webfonts/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fBBc-.woff) format("woff")}</style><link rel="sitemap" type="application/xml" href="/sitemap.xml"/><style>.gatsby-image-wrapper{position:relative;overflow:hidden}.gatsby-image-wrapper picture.object-fit-polyfill{position:static!important}.gatsby-image-wrapper img{bottom:0;height:100%;left:0;margin:0;max-width:none;padding:0;position:absolute;right:0;top:0;width:100%;object-fit:cover}.gatsby-image-wrapper [data-main-image]{opacity:0;transform:translateZ(0);transition:opacity .25s linear;will-change:opacity}.gatsby-image-wrapper-constrained{display:inline-block;vertical-align:top}</style><noscript><style>.gatsby-image-wrapper noscript [data-main-image]{opacity:1!important}.gatsby-image-wrapper [data-placeholder-image]{opacity:0!important}</style></noscript><script type="module">const e="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;e&&document.body.addEventListener("load",(function(e){const t=e.target;if(void 0===t.dataset.mainImage)return;if(void 0===t.dataset.gatsbyImageSsr)return;let a=null,n=t;for(;null===a&&n;)void 0!==n.parentNode.dataset.gatsbyImageWrapper&&(a=n.parentNode),n=n.parentNode;const o=a.querySelector("[data-placeholder-image]"),r=new Image;r.src=t.currentSrc,r.decode().catch((()=>{})).then((()=>{t.style.opacity=1,o&&(o.style.opacity=0,o.style.transition="opacity 500ms linear")}))}),!0);</script><title data-react-helmet="true">AWS NAT instance를 활용한 비용절약</title></head><body><div id="___gatsby"><div style="outline:none" tabindex="-1" id="gatsby-focus-wrapper"><div class="page-wrapper"><header class="page-header-wrapper"><div class="page-header"><div class="front-section"><a class="link" href="/">StatisticsFox.com</a></div><div class="trailing-section"><a class="link" href="/about">about</a><a class="link" href="/posts">posts</a><div class="MuiAutocomplete-root MuiAutocomplete-hasPopupIcon css-18nc3u2"><div class="search-input-wrapper"><div class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root search-input css-feqhe6"><div class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedEnd MuiAutocomplete-inputRoot css-12rx5qu"><input type="text" aria-invalid="false" autoComplete="off" value="" class="MuiInputBase-input MuiInput-input MuiInputBase-inputAdornedEnd MuiAutocomplete-input MuiAutocomplete-inputFocused css-mnn31" aria-autocomplete="list" aria-expanded="false" autoCapitalize="none" spellcheck="false" role="combobox"/><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium search-icon css-vubbuv" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="SearchOutlinedIcon"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg></div></div></div></div></div></div></header><main class="page-content"><header class="post-header"><div class="emoji">🐕</div><div class="info"><div class="categories"><a class="category" href="/posts/Cloud">Cloud</a></div></div><h1 class="title">AWS NAT instance를 활용한 비용절약</h1><div class="info"><div class="author">posted by <strong>최지혁</strong>,</div> <!-- -->April 14, 2024</div></header><div class="post-content"><div class="markdown"><h1 id="nat-인프라" style="position:relative;"><a href="#nat-%EC%9D%B8%ED%94%84%EB%9D%BC" aria-label="nat 인프라 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NAT 인프라</h1>
-<hr>
 <p>이번에 실시간 따릉이 대시보드 제작 프로젝트에 데이터 엔지니어 및 인프라로 참여하게 되었다.
 협업 및 배포의 용이성 때문에 클라우드를 이용하기로 결정이 났고 <font color="#c00000">AWS에 EC2에 카프카 클러스터를 구축</font>하고 프로듀서를 개발하기로 하였다.<br>
 <br/></p>
@@ -85,7 +84,6 @@
 <br/></p>
 <p>학생들이서 하는 토이 프로젝트이므로 퍼블릭 서브넷 기능 하나만 있으면 되기에 묻지도 따지지도 않고 NAT instance를 사용하기로 하였다.</p>
 <h1 id="nat-인스턴스-vs-gateway" style="position:relative;"><a href="#nat-%EC%9D%B8%EC%8A%A4%ED%84%B4%EC%8A%A4-vs-gateway" aria-label="nat 인스턴스 vs gateway permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NAT 인스턴스 vs Gateway</h1>
-<hr>
 <p>NAT Instance는 EC2 Instance를 NAT용으로 바꿔 사용하는 것을 말한다.</p>
 <p><span
       class="gatsby-resp-image-wrapper"
@@ -156,4 +154,316 @@
 </tbody>
 </table>
 <br/>
-이제 NAT INSTANCE를 구성하는 방법은 다음 포스팅에서 다뤄보도록 하겠다.</div></div><div class="post-navigator"><div class="post-navigator-card-wrapper"><a class="post-card prev" href="/Data Engineering/"><div class="direction">이전 글</div><div class="title">DataOptimizations - Speed up your pipeline</div></a></div><div class="post-navigator-card-wrapper"></div></div><div class="utterances"></div></main><footer class="page-footer-wrapper"><p class="page-footer">© <!-- -->2024<!-- --> <a href="https://github.com/StatisticsFox">최지혁</a> powered by<a href="https://github.com/zoomKoding/zoomkoding-gatsby-blog"> zoomkoding-gatsby-blog</a></p></footer><div class="dark-mode-button-wrapper"><button class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium dark-mode-button css-1yxmbwk" tabindex="0" type="button"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeLarge dark-mode-icon css-6flbmm" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="DarkModeIcon"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"></path></svg></button></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/Cloud/";window.___webpackCompilationHash="f4fe6e3515154d83199d";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"polyfill":["/polyfill-f196834924f88edde8fc.js"],"app":["/app-2ce96437d310b0caa8ac.js"],"component---cache-caches-gatsby-plugin-offline-app-shell-js":["/component---cache-caches-gatsby-plugin-offline-app-shell-js-12b5d8159c7e67968cd6.js"],"component---src-pages-404-js":["/component---src-pages-404-js-994d32f99f7af20500f9.js"],"component---src-pages-about-js":["/component---src-pages-about-js-b692191b59c701bb71a8.js"],"component---src-pages-index-js":["/component---src-pages-index-js-774d096c35c01f7fa9a5.js"],"component---src-templates-blog-template-js":["/component---src-templates-blog-template-js-3e34a31f43cfbf62214e.js"],"component---src-templates-category-template-js":["/component---src-templates-category-template-js-665dc149380998d4d8c4.js"]};/*]]>*/</script><script src="/polyfill-f196834924f88edde8fc.js" nomodule=""></script><script src="/app-2ce96437d310b0caa8ac.js" async=""></script><script src="/framework-de157c6b30d4790e4e81.js" async=""></script><script src="/webpack-runtime-3816cebe976a7210796d.js" async=""></script></body></html>
+<h1 id="nat-instance를-구성-방법" style="position:relative;"><a href="#nat-instance%EB%A5%BC-%EA%B5%AC%EC%84%B1-%EB%B0%A9%EB%B2%95" aria-label="nat instance를 구성 방법 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>NAT INSTANCE를 구성 방법</h1>
+<h4 id="서울리전-확인하기" style="position:relative;"><a href="#%EC%84%9C%EC%9A%B8%EB%A6%AC%EC%A0%84-%ED%99%95%EC%9D%B8%ED%95%98%EA%B8%B0" aria-label="서울리전 확인하기 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>서울리전 확인하기</h4>
+<ol>
+<li>서울리전으로 설정하기 않을경우 NW 트래픽 문제나 속도 이슈가 존재하므로 반드시 서울리전으로 설정한다.</li>
+</ol>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 720px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 75%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAYAAADkmO9VAAAACXBIWXMAABYlAAAWJQFJUiTwAAACLUlEQVQ4y31Ty24TQRDcP4ELDwWRIAgPESRACEQOwIl7DKc43AhB/BPfwBUuAQ7hFgGJnPXajnfnvbMvF+re9dqxcFYqjaZnuqaquze4eHkNi7hwaRVXrt/Bys0N3HiwiWv3nmFtYxOr95+3uLr+BLcevsDtx6+w/uglY+XuUwRb2+/xf+xiq1ujQ+v2bhub7js7e3j77iPe7Oyh0/3ACLI8wzLked4gg0tTDEenGAyHiAYDJFKj/PYJ/c+v4b50UdgRfF4i0MZgEVIphpASiRBQSkNr3cYpFicSqvcT8u9X6N4+hIhhXYogyzJMQWpoNcbCWouDg1/Y//4Dh4e/0R9LPi+KAkIq/Dk6xnF4ilh5uGwCpQ0mkwmCqqowDwp675GmKax1UFqzQrI8K0GDzDO8T/ke5QdEMA/68rxgu9FgiH4U4eQkRBQNIKVCnAiOExIhkXrPjs4lJNvOOVZpjGH7aaOQVlI7c1GfUe2XKywKJIngRlDNqMuUSKqJqK5z3UAiI+WJlHUNl1lWSvFlerUsS/gsg3WOH6A9WSUUZcm1FucRkgJKpD0lE2mW5xidjjGOE7ZMZ9NGllW1aJl55hTmMGxR8ThoTbOp0Qv76IURx4mAJ0BrGOtmhA3TWYXNWMw/QrULQ+p2xPVsNPBHRG2XtS9QNUnT5OnMzceMz9Eba0TCQlhPJ2cctYSxMlxsGhPbgH4vsuxc2p5JYzGSFmNlkWjb3qdV6fp3JcJ/Bkc856zf6xwAAAAASUVORK5CYII='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/f715e028c2cabc8500c57e7ff19dc61e/37523/NAT1.png"
+        srcset="/static/f715e028c2cabc8500c57e7ff19dc61e/e9ff0/NAT1.png 180w,
+/static/f715e028c2cabc8500c57e7ff19dc61e/f21e7/NAT1.png 360w,
+/static/f715e028c2cabc8500c57e7ff19dc61e/37523/NAT1.png 720w,
+/static/f715e028c2cabc8500c57e7ff19dc61e/302a4/NAT1.png 1080w,
+/static/f715e028c2cabc8500c57e7ff19dc61e/07a9c/NAT1.png 1440w,
+/static/f715e028c2cabc8500c57e7ff19dc61e/1e5d2/NAT1.png 1630w"
+        sizes="(max-width: 720px) 100vw, 720px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span></p>
+<h4 id="ec2-생성" style="position:relative;"><a href="#ec2-%EC%83%9D%EC%84%B1" aria-label="ec2 생성 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>EC2 생성</h4>
+<ol>
+<li>본격적으로 EC2를 생성해보자 애플리케이션은 일반 Linux 그리고 AMI는 기본으로 설정해주었다.</li>
+</ol>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 720px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 86.66666666666667%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAARCAYAAADdRIy+AAAACXBIWXMAABYlAAAWJQFJUiTwAAACW0lEQVQ4y62UiW7bMAyG/f7P1wJtWqRrlMSHDkvWadnyP1BOg6XYgGGYgA/UZYoSf7q5XK54enrGy+sBg3ZYckaaZ8z/SGOMgXcWeU4o64qtlL+m3FjX9U7TSoMDG3DqR3A7Q/oM6W7431i/3DFxhQ4L1g331mjrIYzFoDRsnOFSvvM1vtuQoF3AaHesj5h8QIgJMe001lqcPj/BTgyXy6VyPp/BGEPbtrXfVcswSFU/nlNEIuJO/IUmhIATY2DsjK7v0fc92q7DtW0xcI6u69D3Ayh5fDSY84JlWZCX3X6nsc5h1AZq1NBklYaQClKNdY4LCdpjnYf3HpREWjNmelgftd6T4kOoG8gJLZL93nfOI8aEZaFMPmb1kYKG7j1Zi2myUOMIbUwd61sEZrL1QBqnNFeN/ol5zmhIR9zlyv9ojQsRbBhxHlR9CzrlIZKUagWQ/ZoPMdYE7MJeMVNRlBXbtqGxacUrG3DsTX14rRScD1BqxGQdtJ7Auah6U1rX55BcQnBRHcZcwFqOMK8gfTc+F7yfLjj1AlNacJki5hihtYalsvQj4pzghYAVHCFEXL3CM/tAWVZc5YSzMGiVxVoKGpc3tGrEYByMTzhzVQUqpYShiCYJFwIc59B9D+8DPkWLVsv6Zs65ehuy+5WdxyB1RZJMOK8SoVbKhlKw/wC2rV6J5IGyYbvJp9D8tt1tQ4I8HN5wPH7g5fUNx48fVXcUifO+JoD6X9AcaTfnXBMjhKwVNo56r2VaJBGT5tpuuAt64AL9wGtF0J7qiBzeDqPMU4TLTdTknBz+BGhNH2W3SkBlAAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/7348d2d09916134876ce93616c16fdd1/37523/NAT3.png"
+        srcset="/static/7348d2d09916134876ce93616c16fdd1/e9ff0/NAT3.png 180w,
+/static/7348d2d09916134876ce93616c16fdd1/f21e7/NAT3.png 360w,
+/static/7348d2d09916134876ce93616c16fdd1/37523/NAT3.png 720w,
+/static/7348d2d09916134876ce93616c16fdd1/302a4/NAT3.png 1080w,
+/static/7348d2d09916134876ce93616c16fdd1/07a9c/NAT3.png 1440w,
+/static/7348d2d09916134876ce93616c16fdd1/5f78c/NAT3.png 1606w"
+        sizes="(max-width: 720px) 100vw, 720px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span>
+<br/>
+2. 서브넷 기능만 있으면 되기에 인스턴스 유형은 부분 무료인 t2.micro로 설정해준다.</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 720px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 28.888888888888886%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAGCAYAAADDl76dAAAACXBIWXMAABYlAAAWJQFJUiTwAAAA7UlEQVQY052Q4W6DMAyEef83XFVWYE1JCimUEEjiJFdhto79naVPVmzZOV9xPpc4fZxwaa5oBwuhDbz3/6Z4PicYY7CuDtYFhigixr+klN4cazElUIwgIs5F20pYa7FHZnLOSDl/DyZm+31dVyzLysNbzzuHSIRjFFVVs8J5njEMA57ThHEcsSmnEOC8Z3qt0UoJrTXssmAyFvW1heoeCBR3OTmjKJsbaiFRC4WyEfhsbhCqx+WrRSUk1L2D6nqm6x8IIbBaRwmjS+gtwfrDQjk56DngbjzTz4FR0/7eTv+xga1IifOvRXgv205+AZBf0SanurLBAAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/6facfec7bb869d05fbad23c38cc4830c/37523/NAT4.png"
+        srcset="/static/6facfec7bb869d05fbad23c38cc4830c/e9ff0/NAT4.png 180w,
+/static/6facfec7bb869d05fbad23c38cc4830c/f21e7/NAT4.png 360w,
+/static/6facfec7bb869d05fbad23c38cc4830c/37523/NAT4.png 720w,
+/static/6facfec7bb869d05fbad23c38cc4830c/302a4/NAT4.png 1080w,
+/static/6facfec7bb869d05fbad23c38cc4830c/07a9c/NAT4.png 1440w,
+/static/6facfec7bb869d05fbad23c38cc4830c/5dded/NAT4.png 1588w"
+        sizes="(max-width: 720px) 100vw, 720px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span>
+<br/>
+3. 키페어를 pem파일로 만들어준다.</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 408px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 96.66666666666666%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAATCAYAAACQjC21AAAACXBIWXMAABYlAAAWJQFJUiTwAAAC2klEQVQ4y6VUWW/TQBD2P0ZIvMMDjxwFAVIlHpGAClXlUBEtBUKbNiFxDqc+0jhnkzaH0/iIj9iOPzSTtqogUAlW+nbXnt1vv5mdWWE2m8FxHPhBgOl0itHIgGXZ6PcHGI/HsCwLhjGGaZqYmCbOJhMYhoHZLASSGECMOApBPGEYQkCS4PXaG5z2+9ja3sHLV2tYXX2OGzdv4d79FTx4+Bi379zF5sdP2Hj7Hk+frWLl0ROc9Lr4IBt4kT3G0PIwPycViJUU0gcp6fVOUK83UCyVcXzcRTq9D0VRoet1NJstyLKCQrEEc3KGw56NbGOMydS/VMmENPE8D1EYIopCxHGMJEkQRRGPhPl8zv9pvLAhiX53mTqKj6ZpEEXxEqVSCeVyGYVCAZlMhv/lcjnUarWFR2GIIJjBD2ZMdgGBTqPL0HUdkiRBlmXepCoKqtUqH1SpVKAoMttarSZ83we1C/VXm0Cd5/mwbRumacG2HYzHZ3CcKSuh74XNhO0s5uRuFC3cpzmrI8WkkAj1RgvtThdfUntQtSO829xCs9WBVFHwfe8AYlFi6PUmtGoN1VodObGEmt6AdKiwTVarEIvlBSEFm05yXY/zixQuLsrHxLR4DIKAYzZ1XYYznfLoeh7bCbSfCUnN11Qa/cEQ/9uYkE477Q84RleD/S8Qfr2l6zZcrPmjwr8Zl7WrpEsVkrFSOYSmVbG+voFcXoSsqPiW2uX6pUXFYgnbn3e4FK9VSB3V8HA04pqlWh4ZBo5qOvL5AmdAqSxBUTV+eYgrjuecg8sg0Aa6jJDqFuCEpdSJ4phP9Hwfc3KHL8/lNDItG6ZlLYVAGT6ZmGi3O5CkCtL7B/yydLs9iGKRQ1GWKvzK8INwXdrQosFwhHxexEEmi0z2B1RVQ6vdQSq1i5pe5+dqd28frutiPk/YC/JsGQTym1zw/QDBLGR4fgDX8xGGEbtMFUL/LNs5d/fP+AlbJZsubVGxrAAAAABJRU5ErkJggg=='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/50cfed78d04939a704f8c42edff5c92d/e7c18/NAT5.png"
+        srcset="/static/50cfed78d04939a704f8c42edff5c92d/e9ff0/NAT5.png 180w,
+/static/50cfed78d04939a704f8c42edff5c92d/f21e7/NAT5.png 360w,
+/static/50cfed78d04939a704f8c42edff5c92d/e7c18/NAT5.png 408w"
+        sizes="(max-width: 408px) 100vw, 408px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span>
+<br/>
+4. vpc 설정해준다.</p>
+<ul>
+<li>기본 vpc</li>
+<li>나의 경우 bcd 서브넷에 카프카 브로커를 할당했으므로 a에 NAT을 할당해준다.</li>
+</ul>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 720px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 72.22222222222221%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAOCAYAAAAvxDzwAAAACXBIWXMAABYlAAAWJQFJUiTwAAACAklEQVQ4y31Saa+bMBDM//9xfR+qp6p6zfVCEsAYHxgbH2SqXUKURFVXGi0YM3vMbLbbHT5+fODn5y+crzWMMcg5I70jZeRSoLVGJyVCmBBjBMXtduM8zzM2WhucLjU6ZTGFgBgTSilMkt9RCrwPcG5ETMu952BC6qi61Lg0Am0r0LQCIQTkXJBS4s4i57SQzDMj3QvEMiOkgjzfFkJrBxy/T9jtD9juD/g+VWhFh2vdoFca4+hhjIUdBhg7cCEa1XsPFybIMaG2E0KacbvN2EgpUVUV2qZBbz18pPHSY/T8hmWfiYnfgzrfCKlwaSWGkODDhGmKmGLkHKbpscs1UxHuMIRFkHdRRK/x+3DGtmrx3fTQxsDReMbAWMudEEkp80OsdCdeC7wQtnrA9tzgdG1xEhq1chBmRGNGKOtALhCdZCiteY90Rnlwju3zonLnC74ai91F4KocbAb0NEOGGT4VjM6x78gBzjn+ibp+3uFLh9YYnKszuk7ybujjMuICuvT8A4uTlxW8BxOSNcguQnTolUIne7bLMDjYwUHdx1uy5XN6J9C45FkyO7mCdrrx4witFHptoZRmMchjpWQUUpbMzFaJ/EyWKnk5Ww3PuLtgc6wlPv8csRcD+lCgQ4EKBb3PDPWUV5CZKf9z5CFEdMbBhcgiuCljjOW/WO+sgjyL8hekuj4fRRk4cgAAAABJRU5ErkJggg=='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/65822120e0b50de542ac26fcb3b46514/37523/NAT6.png"
+        srcset="/static/65822120e0b50de542ac26fcb3b46514/e9ff0/NAT6.png 180w,
+/static/65822120e0b50de542ac26fcb3b46514/f21e7/NAT6.png 360w,
+/static/65822120e0b50de542ac26fcb3b46514/37523/NAT6.png 720w,
+/static/65822120e0b50de542ac26fcb3b46514/302a4/NAT6.png 1080w,
+/static/65822120e0b50de542ac26fcb3b46514/07a9c/NAT6.png 1440w,
+/static/65822120e0b50de542ac26fcb3b46514/ae28e/NAT6.png 1598w"
+        sizes="(max-width: 720px) 100vw, 720px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span>
+<br/>
+5. 인바운드 규칙 설정</p>
+<ul>
+<li>인바운드 규칙은 내 IP를 할당한다.</li>
+</ul>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 720px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 35%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAHCAYAAAAIy204AAAACXBIWXMAABYlAAAWJQFJUiTwAAABDklEQVQoz41R2W7EIAzM/3/hPmQfKnVZQggQ7iuZCqdbVZUqLRIa4cH2eDzN9ztutxvm+Q7Gnmit4TgO9N4Jz/N8647/AydrLYQQUErB+4AQAqFzDqUUvHOGCLFK5JwxKaWhfMFxXF1a64SDfHKOzUbk2r65huM8YYzBKjfoUH7ir8kmbQxiyhSo9SJSyvAhYJUSxjrszsH6C0OMhJvW0NbBeU9vYy1NNGmtsW4KeyxXUerWkVKC1DtMyKi1IJdCqgdnzA7OFyxihTABrVaKk8LhnfMBpQ6FlYrGlEjhg3N8PBg+GQPjCxjnUNrAOU+eyU2BC4kYE0038qeXsX+3NrwqtaDUSupa7/8u5XfeFy/eIB6c9h65AAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/08ef9b8b74619827e1c2d8d30a385cad/37523/NAT7.png"
+        srcset="/static/08ef9b8b74619827e1c2d8d30a385cad/e9ff0/NAT7.png 180w,
+/static/08ef9b8b74619827e1c2d8d30a385cad/f21e7/NAT7.png 360w,
+/static/08ef9b8b74619827e1c2d8d30a385cad/37523/NAT7.png 720w,
+/static/08ef9b8b74619827e1c2d8d30a385cad/302a4/NAT7.png 1080w,
+/static/08ef9b8b74619827e1c2d8d30a385cad/07a9c/NAT7.png 1440w,
+/static/08ef9b8b74619827e1c2d8d30a385cad/35890/NAT7.png 1582w"
+        sizes="(max-width: 720px) 100vw, 720px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span></p>
+<h4 id="eip-할당" style="position:relative;"><a href="#eip-%ED%95%A0%EB%8B%B9" aria-label="eip 할당 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>EIP 할당</h4>
+<ol>
+<li>VPC 접속</li>
+</ol>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 720px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 43.333333333333336%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAJCAYAAAAywQxIAAAACXBIWXMAABYlAAAWJQFJUiTwAAABjUlEQVQoz3XR0XKaQBiGYS6jk0yrKBorCCuCQVgUFEIENSapduqM7SX0/o/eDotpO2Ny8Mwuy/Lvtz9a377nkz7ktmtx07XUeGuM/rrpWHzuOzhyjZAlTrRW3uYDf8X9ak+QPeOnO7SWPaczTumME3SRYEyW2LJShkGBLhZ0REJ7JN+ljyRfzFBpWRHaxJfc2TN0O1YbBt6S8eKRtiXRnTmdi64q/E/zPMeY5vSjil5Y0nVTND8/0JXP6iTdltx5D6TFb9z8G25c8TXcMgw3jVl1LdoylDtM+YTh5Wje4wmzONO2IpXSmOSI+S+C/EiwekXEe8ygwpxtsMLtFbN2edfzMrRpumMSr9W12nbMQCx4SXc45U+c9RlRnhkVJ+zkpfk4+sgOw12iTVd7RFw1DbZjeiIhjLb42QE/O+JlRyy5b9LMmqTXmnVjnKLF6wPufEN/sqQ1eku4xylOiOyIE22x6l4FJcOgekep1G1RBY1xQq3+a+1Lwjh+4r74wfThO9PsgJu8ftjD/9UF/wAjYymuXjTpFwAAAABJRU5ErkJggg=='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/99898e3808f521553e77c4c687e03618/37523/NAT8.png"
+        srcset="/static/99898e3808f521553e77c4c687e03618/e9ff0/NAT8.png 180w,
+/static/99898e3808f521553e77c4c687e03618/f21e7/NAT8.png 360w,
+/static/99898e3808f521553e77c4c687e03618/37523/NAT8.png 720w,
+/static/99898e3808f521553e77c4c687e03618/302a4/NAT8.png 1080w,
+/static/99898e3808f521553e77c4c687e03618/07a9c/NAT8.png 1440w,
+/static/99898e3808f521553e77c4c687e03618/a8979/NAT8.png 1828w"
+        sizes="(max-width: 720px) 100vw, 720px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span></p>
+<ol start="2">
+<li>탄력적 IP로 이동</li>
+</ol>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 468px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 185%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAlCAYAAABCr8kFAAAACXBIWXMAABYlAAAWJQFJUiTwAAAC80lEQVRIx7VWiXKqQBDM///Ue/WSGGM84oWCB+JtIiqHgGjSqZ4SShNBTNXbKoplxaF3erp37g6HA/wgQBjuwXk0gt0O+/0epyMIgnj+8fEh98/Pz7N37lbrNRpKG73+ALn8i1xPhSLKr3WUKlU85J7x998jlJaKSrWB+8c8HnIFrDfW5YCnC/zqduvBsm2EYSgIXXcLy3bg+T58P5C57bjJCKMFx3Exmy/gbrfIOr4HOwv49r5Eta5g8fYev3ztuojw0mLSy1lGjHC13qDZUtFUVBjDcZzTNDSpAfln23GwsWxJfpZ8pQZkjZFdc7WG47pSFktzBdNc/UCYFjwO+L400Wi2pf463T6UtoZSpYbHfOEqEVdJubVUEhGSkLbWxcAYoa12UGsogrZSrcs65fm9pE6fzwJSEcwZ69G2HcnncmnGa5uNdRFdolJoDJTafn8Q+XmeJ/LzPF+MguioJn6YpPGjUTVcRDgcjfFSesVwNEG11kShWEG3p6NWV4QcpoGEMQ2sV5qIbgx/BvwtKUnMn2m5pXagdXui575uCBG0NSLi8/7ol0lSPQtoWbZIbjKdCQHzxRtG46k4ENd5jww3leVLX4w0HI1TJ89ch9xSsVyNCXh6LkoKevoAD08FYfc7mtSALBcii5w4CHbYHV2b81OHzhSQdWWMxoKU+SNJaQxnkl6npwurrMXheHKV0dSAl8bhuE1ul8TchHA6m4sJFEoVOTKr9aaogmhpEDxO6ZWZA1KrTD71Sv3yzjU2AXJ8WvaZ21wnxXHEnWkKkVv7vv97P5xM57JNVetKJ1FvtoTtWw+r/+fY1C1RDYwhWm1NUM5mCykjrdvHaDK9jeWt50nemD82UDynuUazJUH8LamfSWA5xE6cORRiGIzsMuBpv5N5yz3dQC5fFPk1FPXozi08v5TFMKLe8KqWs5KStR2JEepLD/fdFf5oJuoTG0VjI8/yu6C6sbdZeyH6Sw+NqSN3deGiPLJuakMyb/mWOv0C6JBAxTFgDnMAAAAASUVORK5CYII='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/fc606f1f97af047838417f697b1f5bb1/90372/NAT9.png"
+        srcset="/static/fc606f1f97af047838417f697b1f5bb1/e9ff0/NAT9.png 180w,
+/static/fc606f1f97af047838417f697b1f5bb1/f21e7/NAT9.png 360w,
+/static/fc606f1f97af047838417f697b1f5bb1/90372/NAT9.png 468w"
+        sizes="(max-width: 468px) 100vw, 468px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span></p>
+<ol start="3">
+<li>탄력적 IP 생성</li>
+</ol>
+<ul>
+<li>설정 따로 필요 없고 기본으로 생성한다.</li>
+</ul>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 720px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 90.55555555555556%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAASCAYAAABb0P4QAAAACXBIWXMAABYlAAAWJQFJUiTwAAACCElEQVQ4y51UiZKbMAzl/z+u3bbpNslODiCQkA0+wGCb63WkQNIy6e40nnljSdhPhyWCU5ZhtV4jDCMsV2/IRAHvG3jvn0JQVRWKogTtWmvU1qFt26cRmKrC5ZIjz3OI0qIfAAwDhk/Q9z0ercCYCpR2HB+QZu+wzsM59wE86tqiKA0TzB0FqjA4nTIIIWDK8u55wO0CRfxoDaP9L8KjLLEJYxwOCZL0CCEVmraFbxoGyQTn7zLZu9HxRHRLues61LaGqhxSbZHIiuV2vNi2VzSNh288nL+C7j1MmS7pssRFKghdjNDQpYHUGidRIM4No6wdk1rnmHBOxhFSzQjTASoeHxi9dwPQ9ITHdZzXNFBK8wtT21hrOdW6rq+wlm0k27rmXqWuIJ12+lYZw3ayUWDB+fyOL1+/YbF4xY/FTyxXa2y3O2x3O4RRhN1uz9iHIaIoxmazxZb0fYg4E1jHZ7wlF2hdYCBCqschPfILH6l9pOIoG36Q2SR03Uzv0XQDmq6/NXugtEZRlhBSQhcFzyOlQo7smDLLc32Sp7KMpQnS9IjXX0u8vHzn1Ch0ISSDZpwcsi4lqN6TLqWCVOouSwUaY55lSpOIyDON1eR1Grc/I7vrboS97fy3uabomN2MrzgMn7fIv1ZAEUVxgkOS4pILfoz5WP0PAiomEVEtlC5gqpp/sM8S/gYm/na2Nb4HRwAAAABJRU5ErkJggg=='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/f97f15ae1bf37c7c65b779a61be4c03f/37523/NAT10.png"
+        srcset="/static/f97f15ae1bf37c7c65b779a61be4c03f/e9ff0/NAT10.png 180w,
+/static/f97f15ae1bf37c7c65b779a61be4c03f/f21e7/NAT10.png 360w,
+/static/f97f15ae1bf37c7c65b779a61be4c03f/37523/NAT10.png 720w,
+/static/f97f15ae1bf37c7c65b779a61be4c03f/302a4/NAT10.png 1080w,
+/static/f97f15ae1bf37c7c65b779a61be4c03f/07a9c/NAT10.png 1440w,
+/static/f97f15ae1bf37c7c65b779a61be4c03f/7575b/NAT10.png 1608w"
+        sizes="(max-width: 720px) 100vw, 720px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span></p>
+<ol start="4">
+<li>탄력적 주소 IP 연결</li>
+</ol>
+<ul>
+<li>4개의 인스턴스 중 publc-NAT EC2와 연결한다.</li>
+<li>퍼블릭 NAT의 private IP주소를 연결한다.</li>
+</ul>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 720px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 80.55555555555556%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAACXBIWXMAABYlAAAWJQFJUiTwAAACZklEQVQ4y5WUCW/jNhBG9f9/WtHt7sZXbKe2JUvWLVGkDup8BRnbTdIDWAEPHI05DxAwn51v33/w2+/feFmt+f7zhbwoyPL8znv96OVFSSXl/+KYITOQpBlxklKUworSLLfvUZyQZOa3xPakUqi6RpnzK3WNk2U52+2Oy8XF864cDkde9wdbT+PIaBnsOQwDfd//J1prnKZpqKoKc/bDYJsGc2F8Cr8wTZ8ZR6ZpsjOOkIprcLOf3WlN27bPz5rnGfMsy/Kv8LEGK3Vy1eHeEtI0Q8qaaZrNPe6uX3qmacHRnaLMXZLoRJZc6JoU3aSMXcrQpnR1TFsnNCr+RKtie7et/67NnKO7kla84rs/CK4veOc/8LwVJ3/Pwd0RRHtkcSRPXhH5kSLdU2YHW1fFkSzekUY722vk+V049QHRbUMYrAn9FXG05xoe8cIjZXlG1y5KnKjlmUZeqIo3dOPBksAc30mYhxuObgV9G6KERyN9pPAQ+RlVXt4RLqq6IooLVekiS5c8NXKfZcxYxpRpMLKUoYtwMiF580IK1SKannZcLM1gmC2yG1B6fFL3k+3JViOltGuzzLPdU0fUHUGc4YcJtzglLQRZWZELSVEpe/bTgh5n+jum1tOCMlIpmT+ujYnMdvfKar1htdmw3mxZb7ccjm/s9nvOFxdZq39kVlQVutfPPX0KzSKbmL39ebKczmcrcV0P73rFu/rovreXP6ZluCeGr4tt0hHHCX4Q4Ac3rn5AcLsRRhFFURCGkY3lPC+M42SHTIKmef6UpKfQ5LYUwkrz/F1gMH9Xj1g9BA/Jg4foo/Av43PIZeFb4psAAAAASUVORK5CYII='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/b73a382a0dcc2798f7cfd4e4544fa645/37523/NAT11.png"
+        srcset="/static/b73a382a0dcc2798f7cfd4e4544fa645/e9ff0/NAT11.png 180w,
+/static/b73a382a0dcc2798f7cfd4e4544fa645/f21e7/NAT11.png 360w,
+/static/b73a382a0dcc2798f7cfd4e4544fa645/37523/NAT11.png 720w,
+/static/b73a382a0dcc2798f7cfd4e4544fa645/302a4/NAT11.png 1080w,
+/static/b73a382a0dcc2798f7cfd4e4544fa645/07a9c/NAT11.png 1440w,
+/static/b73a382a0dcc2798f7cfd4e4544fa645/dca52/NAT11.png 1550w"
+        sizes="(max-width: 720px) 100vw, 720px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span>
+<span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 720px; "
+    >
+      <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 32.22222222222222%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAGCAYAAADDl76dAAAACXBIWXMAABYlAAAWJQFJUiTwAAAA5klEQVQY05WR207EMAxE+/8/iLZol8Km9EKb5tI0dpp0UIIoyxNipKMZv4wsu3LOoesHEDOIGDHGf7HvOzwRUkrIqty2oet69P0AYwxCCAjMCIHB/DfObZjlUopLobYrrq8tGtFhmBUW6yDNCmU30J5O+DHH4yQdOHUcByrlGJfmHU/1FfXtDZeXO+pGQIwSlnZoH2D8j2fUxmVuJw3jw1lWNpxmiedbg7zpog0WY7/IWVvMiyrkWSqNSSrY1cETY/OEGNPvwnyzcfyAEG25412IkrN778ujsjMHEFHJKUY86rssF34C0CzQdn0hjH0AAAAASUVORK5CYII='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="사진"
+        title="사진"
+        src="/static/184c45277371d239ba75209d2f4cd633/37523/NAT12.png"
+        srcset="/static/184c45277371d239ba75209d2f4cd633/e9ff0/NAT12.png 180w,
+/static/184c45277371d239ba75209d2f4cd633/f21e7/NAT12.png 360w,
+/static/184c45277371d239ba75209d2f4cd633/37523/NAT12.png 720w,
+/static/184c45277371d239ba75209d2f4cd633/302a4/NAT12.png 1080w,
+/static/184c45277371d239ba75209d2f4cd633/07a9c/NAT12.png 1440w,
+/static/184c45277371d239ba75209d2f4cd633/3ceac/NAT12.png 1456w"
+        sizes="(max-width: 720px) 100vw, 720px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+        decoding="async"
+      />
+    </span></p></div></div><div class="post-navigator"><div class="post-navigator-card-wrapper"><a class="post-card prev" href="/Data Engineering/"><div class="direction">이전 글</div><div class="title">DataOptimizations - Speed up your pipeline</div></a></div><div class="post-navigator-card-wrapper"></div></div><div class="utterances"></div></main><footer class="page-footer-wrapper"><p class="page-footer">© <!-- -->2024<!-- --> <a href="https://github.com/StatisticsFox">최지혁</a> powered by<a href="https://github.com/zoomKoding/zoomkoding-gatsby-blog"> zoomkoding-gatsby-blog</a></p></footer><div class="dark-mode-button-wrapper"><button class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium dark-mode-button css-1yxmbwk" tabindex="0" type="button"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeLarge dark-mode-icon css-6flbmm" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="DarkModeIcon"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"></path></svg></button></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/Cloud/";window.___webpackCompilationHash="f4fe6e3515154d83199d";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"polyfill":["/polyfill-f196834924f88edde8fc.js"],"app":["/app-2ce96437d310b0caa8ac.js"],"component---cache-caches-gatsby-plugin-offline-app-shell-js":["/component---cache-caches-gatsby-plugin-offline-app-shell-js-12b5d8159c7e67968cd6.js"],"component---src-pages-404-js":["/component---src-pages-404-js-994d32f99f7af20500f9.js"],"component---src-pages-about-js":["/component---src-pages-about-js-b692191b59c701bb71a8.js"],"component---src-pages-index-js":["/component---src-pages-index-js-774d096c35c01f7fa9a5.js"],"component---src-templates-blog-template-js":["/component---src-templates-blog-template-js-3e34a31f43cfbf62214e.js"],"component---src-templates-category-template-js":["/component---src-templates-category-template-js-665dc149380998d4d8c4.js"]};/*]]>*/</script><script src="/polyfill-f196834924f88edde8fc.js" nomodule=""></script><script src="/app-2ce96437d310b0caa8ac.js" async=""></script><script src="/framework-de157c6b30d4790e4e81.js" async=""></script><script src="/webpack-runtime-3816cebe976a7210796d.js" async=""></script></body></html>
