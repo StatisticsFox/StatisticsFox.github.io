@@ -85,10 +85,10 @@ Cannot initiate the connection to ap-northeast-2.ec2.archive.ubuntu.com:80 (2406
 </ul>
 <h3 id="체크리스트" style="position:relative;"><a href="#%EC%B2%B4%ED%81%AC%EB%A6%AC%EC%8A%A4%ED%8A%B8" aria-label="체크리스트 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>체크리스트</h3>
 <p>첫째로, EC2는 <font color="#245bdb">동일한 VPC에 배포</font>되었으며 각각의 브로커 서브넷은 private로 두기 위해 종류를 다르게 하였다.
-<br/>
-둘째로, 나는 비용절감을 위해<font color="#245bdb"> NAT Instance를 구축</font>했고 public NAT 서버는 라우팅 테이블이 잘 설정되어 있으며 <font color="#245bdb">라우팅 테이블은 3개의 브로커 서브넷을 잘 가리키고 있었다.</font>
-<br/>
-셋째로, 브로커 private 서브넷의 <font color="#245bdb">바운드 규칙 또한 public NAT에 잘 뚫어준 것도  확인</font>했다.</p>
+<br/></p>
+<p>둘째로, 나는 비용절감을 위해<font color="#245bdb"> NAT Instance를 구축</font>했고 public NAT 서버는 라우팅 테이블이 잘 설정되어 있으며 <font color="#245bdb">라우팅 테이블은 3개의 브로커 서브넷을 잘 가리키고 있었다.</font>
+<br/></p>
+<p>셋째로, 브로커 private 서브넷의 <font color="#245bdb">바운드 규칙 또한 public NAT에 잘 뚫어준 것도  확인</font>했다.</p>
 <p>따라서 해당사항은 없다고 생각했다. 때문에 같이 나온 에러인 <font color="#c00000">80번 포트 접속에 대한 101 에러에 대해서 탐색</font>해보기로 했다.</p>
 <h2 id="101-network-is-unreachable-오류" style="position:relative;"><a href="#101-network-is-unreachable-%EC%98%A4%EB%A5%98" aria-label="101 network is unreachable 오류 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>101: Network is unreachable 오류</h2>
 <p>해당 사항에 대해서는 구글링 및 AWS 답변을 찾아본 결과 80번 포트가 막혀있어서 그렇단다. 때문에 public nat의 인바운드와 아웃바운드 규칙을 잠시 모든 TCP에 대하여 허용해주었다.
