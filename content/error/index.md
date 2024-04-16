@@ -16,7 +16,7 @@ Ign: 3 http://ap-northeast-2.ec2.archive.ubuntu.com/ubuntu jammy-backports
 Cannot initiate the connection to ap-northeast-2.ec2.archive.ubuntu.com:80 (2406:da12:944:ae00:128:62c8:e? ). - connect (101: Network is unreachable)
 ```
 다행히도 해당 에러에 대해서는 AWS측에서 답변 달아준 부분 있다. 
-![](https://i.imgur.com/wkAzaAh.png)
+![](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21190&authkey=%21ADpusYyw3sAPnzs&width=1232&height=1038)
 
 ### 공식 해결 방법
 대충 해석을 보면 아래의 포인트들을 다시 체크해봐라 같은데 해석해보면 다음과 같다.
@@ -57,3 +57,6 @@ $ sudo service iptables
 ```
 # 마무리 
 AWS는 삽질을 통한 깨달음을 얻어야 한다!! 해결됐을때 그 시원함도 너무 좋다.
+
+```toc
+```
