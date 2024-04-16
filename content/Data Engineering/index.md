@@ -25,7 +25,7 @@ categories: Data_Engineering
 
 ## CSV vs Parquet
  오늘은 두가지 데이터 포맷을 비교해 볼 것이다. 바로 **parquet**과 **csv** 파일을 비교해 보고자 한다. 나는 통계학과에 재학 당시(사실 지금도 재학 중..) 대부분의 데이터를 이용할때 CSV 형태의 파일을 이용하였다. 왜냐하면 공공데이터나 데이콘 혹은 인터넷에서 주로 배포된 데이터의 경우 대부분 CSV 파일로 배포가 되었기 때문이다. 지금에서야 이유를 생각해보면 CSV가 아무래도 **마이크로소프트 엑셀로 쉽게 확인이 가능하고 훨씬 친숙**하기 때문에 대부분 csv 파일로 데이터를 배포하는 것 같다. 
-![사진](./https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21167&authkey=%21AGSuC2Ee7BHt-n0&width=1202&height=380)
+![사진](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21167&authkey=%21AGSuC2Ee7BHt-n0&width=1202&height=380)
 때문에 나도 parquet 보다는 csv를 주로 이용해봤다. 다만 나는 어떤 실험을 통해 더이상 csv 파일은 왠만해서는 사용하지 않는데 오늘은 이 실험에 대해 소개해 보고자 한다. 
 
 ## csv와 parquet 비교실험
