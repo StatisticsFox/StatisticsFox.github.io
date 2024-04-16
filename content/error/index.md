@@ -28,8 +28,10 @@ Cannot initiate the connection to ap-northeast-2.ec2.archive.ubuntu.com:80 (2406
 ### 체크리스트
 첫째로, EC2는 <font color="#245bdb">동일한 VPC에 배포</font>되었으며 각각의 브로커 서브넷은 private로 두기 위해 종류를 다르게 하였다.
 <br/>
+
 둘째로, 나는 비용절감을 위해<font color="#245bdb"> NAT Instance를 구축</font>했고 public NAT 서버는 라우팅 테이블이 잘 설정되어 있으며 <font color="#245bdb">라우팅 테이블은 3개의 브로커 서브넷을 잘 가리키고 있었다.</font>
 <br/>
+
 셋째로, 브로커 private 서브넷의 <font color="#245bdb">바운드 규칙 또한 public NAT에 잘 뚫어준 것도  확인</font>했다. 
 
 따라서 해당사항은 없다고 생각했다. 때문에 같이 나온 에러인 <font color="#c00000">80번 포트 접속에 대한 101 에러에 대해서 탐색</font>해보기로 했다. 
