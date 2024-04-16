@@ -27,8 +27,10 @@ Cannot initiate the connection to ap-northeast-2.ec2.archive.ubuntu.com:80 (2406
 
 ### 체크리스트
 첫째로, EC2는 <font color="#245bdb">동일한 VPC에 배포</font>되었으며 각각의 브로커 서브넷은 private로 두기 위해 종류를 다르게 하였다.
+<br/>
 둘째로, 나는 비용절감을 위해<font color="#245bdb"> NAT Instance를 구축</font>했고 public NAT 서버는 라우팅 테이블이 잘 설정되어 있으며 <font color="#245bdb">라우팅 테이블은 3개의 브로커 서브넷을 잘 가리키고 있었다.</font>
-셋째로 브로커 private 서브넷의 <font color="#245bdb">바운드 규칙 또한 public NAT에 잘 뚫어준 것도  확인</font>했다. 
+<br/>
+셋째로, 브로커 private 서브넷의 <font color="#245bdb">바운드 규칙 또한 public NAT에 잘 뚫어준 것도  확인</font>했다. 
 
 따라서 해당사항은 없다고 생각했다. 때문에 같이 나온 에러인 <font color="#c00000">80번 포트 접속에 대한 101 에러에 대해서 탐색</font>해보기로 했다. 
 
@@ -58,5 +60,13 @@ $ sudo service iptables
 # 마무리 
 AWS는 삽질을 통한 깨달음을 얻어야 한다!! 해결됐을때 그 시원함도 너무 좋다.
 
+## reference
+[AWS 답변] 
+https://repost.aws/ko/questions/QUTEPp5mJMTqyJfpuA3JCkrA/new-ubuntu-ec2-instance-do-not-work-in-eu-north-1?sc_ichannel=ha&sc_ilang=en&sc_isite=repost&sc_iplace=hp&sc_icontent=QUTEPp5mJMTqyJfpuA3JCkrA&sc_ipos=16
+
+https://repost.aws/ko/questions/QURAplea7CQY2d_4BOXR4HLQ/unable-to-connect-101-network-is-unreachable
+
+[Iptable]
+https://hobbylists.tistory.com/entry/Iptables-기초-사용법과-옵션-정리-1-방화벽-Netfilter-리눅스
 ```toc
 ```
