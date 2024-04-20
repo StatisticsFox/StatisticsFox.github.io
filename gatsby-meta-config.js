@@ -1,5 +1,5 @@
 module.exports = {
-  title: `StatisticsFox.com`,
+  title: `지혁이의 데엔일기`,
   description: `지혁이의 데엔일기`,
   language: `ko`, // `ko`, `en` => currently support versions for Korean and English
   siteUrl: `https://statisticsfox.github.io/`,
