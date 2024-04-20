@@ -40,12 +40,12 @@ $>./bin/kafka-topics.sh --create --topic fastcampus \
 # Kafka - Core
 ## kafka의 기본 아이디어
  ![사진](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21191&authkey=%21AC2HGNuR6n4NqmI&width=1799&height=691)
-##### 카프카에 <u>데이터를 넣는</u> <font color="#c00000">Producer</font>
-##### 그 <u>데이터를 꺼내가는</u> <font color="#c00000">consumer</font>
-##### 그 <u>데이터가 들어가는</u> 공간인 <font color="#c00000">Topic</font>
+#### 카프카에 <u>데이터를 넣는</u> <font color="#c00000">Producer</font>
+#### 그 <u>데이터를 꺼내가는</u> <font color="#c00000">consumer</font>
+#### 그 <u>데이터가 들어가는</u> 공간인 <font color="#c00000">Topic</font>
 - topic은 사실상 <u>카프카를 사용하는 이유</u>이다.
  - 카프카에서 메시지를 구분하는 단위다.(파일 시스템의 폴더와 유사)
- - 어러 토픽으로 이뤄질 수 있고 목적에 따라 이름을 붙일 수 있다.(-> 폴더에 이름 붙이는거와 같음
+ - 어러 토픽으로 이뤄질 수 있고 목적에 따라 이름을 붙일 수 있다. -> 폴더에 이름 붙이는거와 같음
 
 ![사진](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21200&authkey=%21ANuASgyQOYKM1og&width=1450&height=472)
 
@@ -94,15 +94,15 @@ $>./bin/kafka-topics.sh --create --topic fastcampus \
 
 #### ACK 설정에 따른 가용성과 속도의 Trade off
 보통 요구 사항에 따라 결정한다.
-##### ACK = 0
+##### <font color="#c00000">**ACK = 0**</font>
 - 리더에게 전송하고 <u><font color="#c00000">응답값을 받지 않는다.</font></u>
 - 리더에 잘 갔는지도, 복제되었는지도 알 수 없다.
 ![사진](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21194&authkey=%21AMZSSrIZN5UirAY&width=1184&height=362)
-##### ACK = 1
+##### <font color="#c00000">**ACK = 1**</font>
 - 리더에게 전송하고, <u><font color="#c00000">리더에게만 응답값을 받는다.</font></u>
 - 리더에게는 잘 갔는지 알 수 있지만, 잘 복제되었는지는 알 수 없다.
 ![사진](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21192&authkey=%21AKxo8F3KmEECInw&width=1171&height=345)
-##### ACK = all
+##### <font color="#c00000">**ACK = all**</font>
 - 리더에게 전송하고, 리더와 팔로워 <u><font color="#c00000">모두에게 응답값을 받는다.</font></u>
 ![사진](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21193&authkey=%21AIPcapuAQe40qDI&width=1163&height=364)
 ### Consumer
