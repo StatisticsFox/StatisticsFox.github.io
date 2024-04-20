@@ -88,7 +88,7 @@ $>./bin/kafka-topics.sh --create --topic fastcampus \
 ![사진](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21204&authkey=%21AJtaBMq0c8chJjo&width=720&height=319)
 - **ProducerRecord** : 프로듀서에서 생성하는 레코드
 - **send()** : 레코드 전송 요청 메소드
-- **Partitioner** : 어느 파티션으로 전송할 지 지정
+- **Partitioner** : 어느 파티션으로 전송할지 지정
 - **Accumulator** : 배치로 묶어 전송할 데이터를 모으는 버퍼
 - **Sender** : Accumulator의 메시지를 Fetch하여 브로커로 전송
 

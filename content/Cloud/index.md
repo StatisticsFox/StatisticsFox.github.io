@@ -110,4 +110,4 @@ NAT Instance는 EC2 Instance를 NAT용으로 바꿔 사용하는 것을 말한�
 ![사진](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21189&authkey=%21AHnhNMasptV-XKk&width=1456&height=466)
 
 # 마무리
-이렇게 하면 간단하게 NAT 인스터스 생성이 가능하다. 이제 이 퍼블릭 서버 내부에 프라이빗 서 버 key 값을 scp 명령어로 집어 넣고 본격적으로 카프카 클러스터를 구축이 가능하다. 
+이렇게 하면 간단하게 NAT 인스터스 생성이 가능하다. 이제 이 퍼블릭 서버 내부에 프라이빗 서 버 key 값을 scp 명령어로 집어 넣고 본격적으로 카프카 클러스터를 구축이 가능하다.
