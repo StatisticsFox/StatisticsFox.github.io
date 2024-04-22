@@ -6,7 +6,7 @@ author: 최지혁
 tags: kafka
 categories: Data_Engineering
 ---
-![사진](https://fs.buttercms.com/resize=width:940/308TQEVTEe468SWNPWwn)
+![사진](https://fs.buttercms.com/resize=width:940/308TQEVTEe468SWNPWwn)*카프카 로고*
 이번에 카프카를 로컬에서도 돌려보고 클라우드 환경에서도 다뤄보게 되었다. 그래서 카프카의 구조나 기본 개념에 대해 정리를 하고 가야할 필요성을 느꼈다. 
 
 물론 실제 구축을 할때는 인프라적인 측면에서 더 애를 먹는다. 방화벽 설정이라던지.. 그래서 기본적인 개념에 대해서는 약간 소홀해 지는 경향이 있었다. 
