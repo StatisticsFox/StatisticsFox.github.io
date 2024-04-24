@@ -199,12 +199,12 @@ git clone https://github.com/apache/superset.git
 docker compose -f docker-compose-non-dev.yml up
 ```
 
-## Connect superset and Druid
+### Connect superset and Druid
 아래처럼 나의 로컬 드루이드 URL을 사용해서 superset과 druid를 연결할 수 있다.
 URL의 포맷은 [공식문서](https://superset.apache.org/docs/databases/druid/)를 참고하였다.
 ![connect druid](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21209&authkey=%21AJOYaH5gbU8sqBU&width=3024&height=1728)
 
-## Create DashBoard on Superset
+### Create DashBoard on Superset
 이제 아래 처럼 Superset을 이용해 Dash보드를 구성할 수 있다. 이번에 Superset을 완전 처음 쓰는거라 아직 기능적인 이해도는 떨어지지만 점차 기능을 추가해나갈 예정이다. 
 ![dash board](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21208&authkey=%21AEr5A4PxVVTdSBk&width=3248&height=2112)
 
