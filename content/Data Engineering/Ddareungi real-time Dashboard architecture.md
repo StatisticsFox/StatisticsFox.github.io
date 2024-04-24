@@ -215,10 +215,10 @@ URL의 포맷은 [공식문서](https://superset.apache.org/docs/databases/druid
 일단은 성공적으로 실시간 파이프라인 구축을 마칠 수 있었다. 사실 이번 개인 프로젝트의 목적은 대시보드가 중심이 아니다. <span style="background:#fdbfff">오픈소스와 speed layer을 활용하여 실시간 대시보드를 성공적으로 구축했는가에 초점이 있다. </span>때문에 대시보드를 상세하게 구축하는데 초점을 두지는 않기로 했다. 언젠가 BI 엔지니어와 협업하게 된다면 그때 커뮤니케이션을 통해서 잘 만들어갈 수 있을 것이라 생각한다. 현재 진행중인 클라우드 서비스를 통한 실시간 대시보드 구축 프로젝트에서 BI 담당이신 박지현님과 충분한 커뮤니케이션을 통해 역량을 강화하고자 한다.
 
 ## Reference
-[Project reference](https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pinot-apache-druid-and-apache-superset-e67161eb9666)
-[Superset에 대하여](https://www.udemy.com/course/apache-superset-for-data-engineers-hands-on/?couponCode=ST6MT42324)
-[Superset git](https://github.com/apache/superset)
-[Druid 기초](https://www.udemy.com/course/apache-druid-a-hands-on-course/)
-[APACHE DRUID](https://www.apache.org/dyn/closer.cgi?path=/druid/29.0.1/apache-druid-29.0.1-bin.tar.gz)
-[Kafka Basic](https://statisticsfox.github.io/Data%20Engineering/kafka/)
-[Pinot VS Druid](https://imply.io/blog/choosing-a-database-for-real-time-analytics-druid-and-pinot/)
+[Project reference](https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pinot-apache-druid-and-apache-superset-e67161eb9666)<br/>
+[Superset에 대하여](https://www.udemy.com/course/apache-superset-for-data-engineers-hands-on/?couponCode=ST6MT42324)<br/>
+[Superset git](https://github.com/apache/superset)<br/>
+[Druid 기초](https://www.udemy.com/course/apache-druid-a-hands-on-course/)<br/>
+[APACHE DRUID](https://www.apache.org/dyn/closer.cgi?path=/druid/29.0.1/apache-druid-29.0.1-bin.tar.gz)<br/>
+[Kafka Basic](https://statisticsfox.github.io/Data%20Engineering/kafka/)<br/>
+[Pinot VS Druid](https://imply.io/blog/choosing-a-database-for-real-time-analytics-druid-and-pinot/)<br/>
