@@ -77,14 +77,14 @@ https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pi
 <a href="https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pinot-apache-druid-and-apache-superset-e67161eb9666">https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pinot-apache-druid-and-apache-superset-e67161eb9666</a>
 2년이 넘은 자료이기는 하지만 내 요구사항을 모두 만족했기에 아주 적합한 래퍼런스였다.
 그럼 이제 시작해보자
-<img src="http://mail.jjal.today/data/file/gallery/1850094941_Ejxzeol4_5fd5695eb972096949f5bbb720d855d72cae8045.jpg" alt="시작해보자"></p>
+<img src="https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21211&#x26;authkey=%21AInaQqp_g1hhKd0&#x26;width=564&#x26;height=311" alt="시작해보자"></p>
 <h2 id="ddareungi-real-time-dashboard-architecture" style="position:relative;"><a href="#ddareungi-real-time-dashboard-architecture" aria-label="ddareungi real time dashboard architecture permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Ddareungi real-time Dashboard architecture</h2>
 <p><img src="https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21206&#x26;authkey=%21ALbDIYVRTxIVsFE&#x26;width=2400&#x26;height=868" alt="Dashboard architecture"></p>
 <p>위는 내가 수정한 아키텍처다. 신경 쓴 부분은 아래와 같다.</p>
 <ul>
 <li>Docker는 Superset을 올릴때만 사용하고자 한다.
 <ul>
-<li>레퍼런스에서는 모든 프레임워크를 Docker Labs위에서 실행했는데 <strong>%3Cspan style=“background:#fff88f”%3EDocker Labs는 사용시간 2시간의 제한이 있다</span></strong>… 그리고 굳이 docker가 있는데 Docker Labs를 사용해야 할 필요성을 못느꼈다.(옛날에 학교에서 docker 처음 배웠을때 한번 써봤다.)</li>
+<li>레퍼런스에서는 모든 프레임워크를 Docker Labs위에서 실행했는데 <strong><span style="background:#fff88f">Docker Labs는 사용시간 2시간의 제한이 있다</span></strong>… 그리고 굳이 docker가 있는데 Docker Labs를 사용해야 할 필요성을 못느꼈다.(옛날에 학교에서 docker 처음 배웠을때 한번 써봤다.)</li>
 </ul>
 </li>
 <li><strong>Speed Layer는</strong> <font color="#c00000">Druid로 선정</font>하였다.
@@ -122,7 +122,8 @@ https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pi
 <li>Apache Druid: 29.0.1</li>
 <li>Apache superset: latest</li>
 </ul>
-<p>Data: <a href="https://data.seoul.go.kr/dataList/OA-15493/A/1/datasetView.do">https://data.seoul.go.kr/dataList/OA-15493/A/1/datasetView.do</a></p>
+<p>데이터는 서울시에서 제공하는 실시간 따릉이 정거장 정보 API를 활용했다.
+Data: <a href="https://data.seoul.go.kr/dataList/OA-15493/A/1/datasetView.do">https://data.seoul.go.kr/dataList/OA-15493/A/1/datasetView.do</a></p>
 <h2 id="set-up-kafka-on-local" style="position:relative;"><a href="#set-up-kafka-on-local" aria-label="set up kafka on local permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Set up kafka on Local</h2>
 <h3 id="install-kafka" style="position:relative;"><a href="#install-kafka" aria-label="install kafka permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>install kafka</h3>
 <p>원하는 버전의 kafka를 다운 받아준다. kraft 체제의 3점대 버전을 고를까 고민하다가 사실 3점대 버전은 레퍼런스도 많이 없고 익숙하지 않아 2.7점대 버전이자 <font color="#c00000">zookeeper 체제의 latest 버전을 받았다.</font></p>
@@ -246,7 +247,7 @@ http://localhost:8888</code></pre></div>
 <p>데이터 포멧 및 타임 스템프 지정 과 변환 및 필터, 스키마구성과 파티션 설정 등 Druid 내 다양한 환경 설정은 다른 post에서 다루고자 한다.</p>
 </blockquote>
 <h2 id="set-up-superset-on-docker" style="position:relative;"><a href="#set-up-superset-on-docker" aria-label="set up superset on docker permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Set up Superset on Docker</h2>
-<p>먼저 git을 통해 공식 superset을 받아온 후 superset을 실행해준다. 꽤 올래걸리니 다른거 하다 와도 좋다.</p>
+<p>먼저 git을 통해 공식 superset을 받아온 후 superset을 실행해준다. 꽤 오래 걸리니 다른거 하다 와도 좋다.</p>
 <div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">### Superset git clone
 git clone https://github.com/apache/superset.git
 
@@ -262,7 +263,7 @@ URL의 포맷은 <a href="https://superset.apache.org/docs/databases/druid/">공
 <p>생각보다 Superset을 쓰는 방법이 쉽지많은 않다. 아래 강의를 통해 조금은 알아보려고 한다.
 <a href="https://www.udemy.com/course/apache-superset-for-data-engineers-hands-on/?couponCode=ST6MT42324">Superset 강의</a></p>
 <h1 id="마무리" style="position:relative;"><a href="#%EB%A7%88%EB%AC%B4%EB%A6%AC" aria-label="마무리 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>마무리</h1>
-<p>일단은 성공적으로 실시간 파이프라인 구축을 마칠 수 있었다. 사실 이번 개인 프로젝트의 목적은 대시보드가 중심이 아니다. 오픈소스와 speed layer을 활용하여 실시간 대시보드를 성공적으로 구축했는가에 초점이 있다. 때문에 대시보드를 상세하게 구축하는데 초점을 두지는 않기로 했다. 언젠가 BI 엔지니어와 협업하게 된다면 그때 커뮤니케이션을 통해서 잘 만들어갈 수 있을 것이라 생각한다. 현재 진행중인 클라우드 서비스를 통한 실시간 대시보드 구축 프로젝트에서 BI 담당이신 박지현님과 충분한 커뮤니케이션을 통해 역량을 강화하고자 한다.</p>
+<p>일단은 성공적으로 실시간 파이프라인 구축을 마칠 수 있었다. 사실 이번 개인 프로젝트의 목적은 대시보드가 중심이 아니다. <span style="background:#fdbfff">오픈소스와 speed layer을 활용하여 실시간 대시보드를 성공적으로 구축했는가에 초점이 있다. </span>때문에 대시보드를 상세하게 구축하는데 초점을 두지는 않기로 했다. 언젠가 BI 엔지니어와 협업하게 된다면 그때 커뮤니케이션을 통해서 잘 만들어갈 수 있을 것이라 생각한다. 현재 진행중인 클라우드 서비스를 통한 실시간 대시보드 구축 프로젝트에서 BI 담당이신 박지현님과 충분한 커뮤니케이션을 통해 역량을 강화하고자 한다.</p>
 <h2 id="reference" style="position:relative;"><a href="#reference" aria-label="reference permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reference</h2>
 <p><a href="https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pinot-apache-druid-and-apache-superset-e67161eb9666">Project reference</a>
 <a href="https://www.udemy.com/course/apache-superset-for-data-engineers-hands-on/?couponCode=ST6MT42324">Superset에 대하여</a>
