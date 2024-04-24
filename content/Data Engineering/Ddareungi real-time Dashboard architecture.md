@@ -7,8 +7,8 @@ tags: Ddareungi Realtime
 categories: Data_Engineering
 ---
 # Base
-이번에 한이음의 일환으로 클라우드 환경에서 실시간 따릉이 대시보드를 만들게 되었다. 다만 내 역할이 데이터 엔지니어링 및 인프라에 국한되어 있어 개인적으로 오픈소스를 활용하여 로컬에서 하나를 더 만들어 보려고 한다. 때문에 레퍼런스를 찾던 도중 다음과 같은 글을 발견했다.
-https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pinot-apache-druid-and-apache-superset-e67161eb9666
+이번에 한이음의 일환으로 클라우드 환경에서 실시간 따릉이 대시보드를 만들게 되었다. 다만 <span style="background:#fdbfff">내 역할이 데이터 엔지니어링 및 인프라에 국한</span>되어 있어 개인적으로 오픈소스를 활용하여 로컬에서 하나를 더 만들어 보려고 한다. 때문에 레퍼런스를 찾던 도중 다음과 같은 글을 발견했다.
+https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pinot-apache-druid-and-apache-superset-e67161eb9666 <br/>
 2년이 넘은 자료이기는 하지만 내 요구사항을 모두 만족했기에 아주 적합한 래퍼런스였다.
 그럼 이제 시작해보자
 ![시작해보자](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21211&authkey=%21AInaQqp_g1hhKd0&width=564&height=311)
@@ -43,7 +43,7 @@ Framework version
 - Apache Druid: 29.0.1
 - Apache superset: latest
 
-데이터는 서울시에서 제공하는 실시간 따릉이 정거장 정보 API를 활용했다.
+데이터는 서울시에서 제공하는 실시간 따릉이 정거장 정보 API를 활용했다. <br/>
 Data: https://data.seoul.go.kr/dataList/OA-15493/A/1/datasetView.do
 ## Set up kafka on Local
 ### install kafka
@@ -222,3 +222,6 @@ URL의 포맷은 [공식문서](https://superset.apache.org/docs/databases/druid
 [APACHE DRUID](https://www.apache.org/dyn/closer.cgi?path=/druid/29.0.1/apache-druid-29.0.1-bin.tar.gz)<br/>
 [Kafka Basic](https://statisticsfox.github.io/Data%20Engineering/kafka/)<br/>
 [Pinot VS Druid](https://imply.io/blog/choosing-a-database-for-real-time-analytics-druid-and-pinot/)<br/>
+
+```toc
+```
