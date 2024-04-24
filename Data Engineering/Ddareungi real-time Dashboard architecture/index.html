@@ -253,11 +253,11 @@ git clone https://github.com/apache/superset.git
 
 ### Superset 실행
 docker compose -f docker-compose-non-dev.yml up</code></pre></div>
-<h2 id="connect-superset-and-druid" style="position:relative;"><a href="#connect-superset-and-druid" aria-label="connect superset and druid permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Connect superset and Druid</h2>
+<h3 id="connect-superset-and-druid" style="position:relative;"><a href="#connect-superset-and-druid" aria-label="connect superset and druid permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Connect superset and Druid</h3>
 <p>아래처럼 나의 로컬 드루이드 URL을 사용해서 superset과 druid를 연결할 수 있다.
 URL의 포맷은 <a href="https://superset.apache.org/docs/databases/druid/">공식문서</a>를 참고하였다.
 <img src="https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21209&#x26;authkey=%21AJOYaH5gbU8sqBU&#x26;width=3024&#x26;height=1728" alt="connect druid"></p>
-<h2 id="create-dashboard-on-superset" style="position:relative;"><a href="#create-dashboard-on-superset" aria-label="create dashboard on superset permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Create DashBoard on Superset</h2>
+<h3 id="create-dashboard-on-superset" style="position:relative;"><a href="#create-dashboard-on-superset" aria-label="create dashboard on superset permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Create DashBoard on Superset</h3>
 <p>이제 아래 처럼 Superset을 이용해 Dash보드를 구성할 수 있다. 이번에 Superset을 완전 처음 쓰는거라 아직 기능적인 이해도는 떨어지지만 점차 기능을 추가해나갈 예정이다.
 <img src="https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21208&#x26;authkey=%21AEr5A4PxVVTdSBk&#x26;width=3248&#x26;height=2112" alt="dash board"></p>
 <p>생각보다 Superset을 쓰는 방법이 쉽지많은 않다. 아래 강의를 통해 조금은 알아보려고 한다.
@@ -303,12 +303,10 @@ URL의 포맷은 <a href="https://superset.apache.org/docs/databases/druid/">공
 </li>
 <li>
 <p><a href="#set-up-superset-on-docker">Set up Superset on Docker</a></p>
-</li>
-<li>
-<p><a href="#connect-superset-and-druid">Connect superset and Druid</a></p>
-</li>
-<li>
-<p><a href="#create-dashboard-on-superset">Create DashBoard on Superset</a></p>
+<ul>
+<li><a href="#connect-superset-and-druid">Connect superset and Druid</a></li>
+<li><a href="#create-dashboard-on-superset">Create DashBoard on Superset</a></li>
+</ul>
 </li>
 <li>
 <p><a href="#reference">Reference</a></p>
