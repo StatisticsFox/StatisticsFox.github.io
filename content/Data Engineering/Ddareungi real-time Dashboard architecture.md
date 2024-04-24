@@ -11,13 +11,13 @@ categories: Data_Engineering
 https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pinot-apache-druid-and-apache-superset-e67161eb9666
 2년이 넘은 자료이기는 하지만 내 요구사항을 모두 만족했기에 아주 적합한 래퍼런스였다.
 그럼 이제 시작해보자
-![시작해보자](http://mail.jjal.today/data/file/gallery/1850094941_Ejxzeol4_5fd5695eb972096949f5bbb720d855d72cae8045.jpg)
+![시작해보자](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21211&authkey=%21AInaQqp_g1hhKd0&width=564&height=311)
 ## Ddareungi real-time Dashboard architecture
 ![Dashboard architecture](https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21206&authkey=%21ALbDIYVRTxIVsFE&width=2400&height=868)
 
 위는 내가 수정한 아키텍처다. 신경 쓴 부분은 아래와 같다.
 - Docker는 Superset을 올릴때만 사용하고자 한다.
-	- 레퍼런스에서는 모든 프레임워크를 Docker Labs위에서 실행했는데 **%3Cspan style="background:#fff88f"%3EDocker Labs는 사용시간 2시간의 제한이 있다</span>**.... 그리고 굳이 docker가 있는데 Docker Labs를 사용해야 할 필요성을 못느꼈다.(옛날에 학교에서 docker 처음 배웠을때 한번 써봤다.)
+	- 레퍼런스에서는 모든 프레임워크를 Docker Labs위에서 실행했는데 **<span style="background:#fff88f">Docker Labs는 사용시간 2시간의 제한이 있다</span>**.... 그리고 굳이 docker가 있는데 Docker Labs를 사용해야 할 필요성을 못느꼈다.(옛날에 학교에서 docker 처음 배웠을때 한번 써봤다.)
 	
 - **Speed Layer는** <font color="#c00000">Druid로 선정</font>하였다.
 	- 사실 성능만 생각하면 <font color="#c00000">대규모 데이터 세트로 갈수록 낮은 레이턴시 쿼리를 제공</font>하는 Apache pinot을 선택하는게 맞다. 하지만 다음과 같은 이유에서 Druid로 선정하였다.
@@ -43,6 +43,7 @@ Framework version
 - Apache Druid: 29.0.1
 - Apache superset: latest
 
+데이터는 서울시에서 제공하는 실시간 따릉이 정거장 정보 API를 활용했다.
 Data: https://data.seoul.go.kr/dataList/OA-15493/A/1/datasetView.do
 ## Set up kafka on Local
 ### install kafka
@@ -189,7 +190,7 @@ http://localhost:8888
  > 데이터 포멧 및 타임 스템프 지정 과 변환 및 필터, 스키마구성과 파티션 설정 등 Druid 내 다양한 환경 설정은 다른 post에서 다루고자 한다. 
 
 ## Set up Superset on Docker
-먼저 git을 통해 공식 superset을 받아온 후 superset을 실행해준다. 꽤 올래걸리니 다른거 하다 와도 좋다.
+먼저 git을 통해 공식 superset을 받아온 후 superset을 실행해준다. 꽤 오래 걸리니 다른거 하다 와도 좋다.
 ```zsh
 ### Superset git clone
 git clone https://github.com/apache/superset.git
@@ -211,7 +212,7 @@ URL의 포맷은 [공식문서](https://superset.apache.org/docs/databases/druid
 [Superset 강의](https://www.udemy.com/course/apache-superset-for-data-engineers-hands-on/?couponCode=ST6MT42324)
 
 # 마무리
-일단은 성공적으로 실시간 파이프라인 구축을 마칠 수 있었다. 사실 이번 개인 프로젝트의 목적은 대시보드가 중심이 아니다. 오픈소스와 speed layer을 활용하여 실시간 대시보드를 성공적으로 구축했는가에 초점이 있다. 때문에 대시보드를 상세하게 구축하는데 초점을 두지는 않기로 했다. 언젠가 BI 엔지니어와 협업하게 된다면 그때 커뮤니케이션을 통해서 잘 만들어갈 수 있을 것이라 생각한다. 현재 진행중인 클라우드 서비스를 통한 실시간 대시보드 구축 프로젝트에서 BI 담당이신 박지현님과 충분한 커뮤니케이션을 통해 역량을 강화하고자 한다.
+일단은 성공적으로 실시간 파이프라인 구축을 마칠 수 있었다. 사실 이번 개인 프로젝트의 목적은 대시보드가 중심이 아니다. <span style="background:#fdbfff">오픈소스와 speed layer을 활용하여 실시간 대시보드를 성공적으로 구축했는가에 초점이 있다. </span>때문에 대시보드를 상세하게 구축하는데 초점을 두지는 않기로 했다. 언젠가 BI 엔지니어와 협업하게 된다면 그때 커뮤니케이션을 통해서 잘 만들어갈 수 있을 것이라 생각한다. 현재 진행중인 클라우드 서비스를 통한 실시간 대시보드 구축 프로젝트에서 BI 담당이신 박지현님과 충분한 커뮤니케이션을 통해 역량을 강화하고자 한다.
 
 ## Reference
 [Project reference](https://medium.com/@emergeit/realtime-data-streaming-with-apache-kafka-apache-pinot-apache-druid-and-apache-superset-e67161eb9666)
