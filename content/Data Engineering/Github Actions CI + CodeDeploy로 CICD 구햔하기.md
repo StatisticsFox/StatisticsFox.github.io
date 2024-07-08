@@ -13,7 +13,7 @@ categories: Data_Engineering
 
 그것이 바로.. CI/CD다!! Devops의 기본 소양이자 DE라면 당연히 알아야 하는 CI/CD를 구현해보기로 했다. 다행히도 학교에서 젠킨스를 이용한 CI/CD 구현 수업을 들었기에 개념 정도는 꿰고 있었다. 
 
-> CI/CD란?
+> CI/CD란? <br>
 > 지속적 통합/지속적 배포 라는 뜻으로 <font color="#c00000">코드 변경 사항을 자동으로 통합하고 배포하는 과정</font>을 말한다. 이를 통해 개발 과정이 자동화되어 개발자의 삶의 질을 향상시킨다. 지속적 통합(CI)은 코드 변경을 자주 통합하여 문제를 신속히 발견하고, 지속적 배포(CD)는 변경 사항을 자동으로 배포하여<font color="#c00000"> 사용자에게 빠르게 제공</font>할 수 있게 한다.
 
 본격적으로 시작해보자 <br>
@@ -55,15 +55,15 @@ GitHub action(CI)과 AWS의 Code Deploy(CD) 제품을 함께 사용했다. 이�
 **IAM -> 역할 -> 역할생성** <br>
 <div align="center">
     <img src= https://1drv.ms/i/c/9ded56be8cf81c92/IQNqsyIntaXbRKCxmcf_Z9r-Abe34AfYKDGNrgI1vCSdZ40?width=1024 alt="아키텍쳐" />
-</div>
-그 후 아래와 같이 설정 <br>
+</div> <br>
+그 후 아래와 같이 설정
 <div align="center">
     <img src= https://1drv.ms/i/c/9ded56be8cf81c92/IQO7h4n1sBMXTb0r3cUVS_wNAUKQh08ymvDTGBcg3itiYco?width=1024 alt="아키텍쳐" />
-</div>
+</div><br>
 AWSCodeDeployFullAccess 와 AmazonS3FullAccess 2개 선택 <br>
 <div align="center">
     <img src= https://1drv.ms/i/c/9ded56be8cf81c92/IQNi53WlbB_NR4xGnwe--w8PATwtAkMOar9T3XrpI4164yM?width=1024 alt="아키텍쳐" />
-</div>
+</div><br>
 이름지정 
 <div align="center">
     <img src= https://1drv.ms/i/c/9ded56be8cf81c92/IQPGSdrNw4qlQrqHDkOl984nAeqsejEfMqOffkNUaHPH_kY?width=1024 alt="아키텍쳐" />
@@ -107,7 +107,7 @@ AWSCodeDeployFullAccess 와 AmazonS3FullAccess 2개 선택 <br>
 >- AllAtTime: 최대한 한번에 많은 인스턴스에 배포, 1개의 인스턴스에 라도 배포 성공하면 성공으로 간주
 <div align="center">
     <img src= https://1drv.ms/i/c/9ded56be8cf81c92/IQOBPhjqqNLMR6dv2mJibzX1Aeq4pvImkSMUitv8l8rfH0M?width=1024 alt="배포 유형 및 환경 구성" />
-</div>
+</div><br>
 마지막으로 로드 밸런서 해제만 체크 해주면 비로소 Codedeploy 설정이 끝나게 된다. 우리는 CD 즉, 지속적 배포가 목적이기 때문에 로드 밸런서는 따로 필요하지 않다. 
 <div align="center">
     <img src= https://1drv.ms/i/c/9ded56be8cf81c92/IQNOB1rbSW0kT4_sXYCji7DEAfaMG5LiSHjAijUuLKkDVm8?width=1200&height=280 alt="로드 밸런서" />
@@ -140,7 +140,7 @@ S3 버킷은 우리가 중요한 저장소를 만들어서 관리하다기 보�
 전 단계에서 만든 사용자 -> 엑세스 키 생성을 선택한다.
 <div align="center">
     <img src= https://1drv.ms/i/c/9ded56be8cf81c92/IQNrZmzeyJROTYK7LreOLlp8ARJIfFVmyH6xJNw4ZwuuSak?width=1322&height=548 alt="엑세스 키 생성" />
-</div>
+</div><br>
 그럼 다음과 같이 <font color="#c00000">ACCESS KEY</font>와 <font color="#c00000">SECRET ACCESS KEY</font>가 만들어진다.
 <div align="center">
     <img src= https://1drv.ms/i/c/9ded56be8cf81c92/IQNVa_UAh0MRQaXVmeec5O_iAWHPbVQ9Vx0i0fz4eUWm9kk?width=1102&height=544 alt="엑세스 키 저장" />
