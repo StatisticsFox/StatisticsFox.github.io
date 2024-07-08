@@ -69,7 +69,7 @@
 <p>다만 producer는 아직 본격적으로 개발한 상태가 아닐뿐더러 나중에 대시보드를 배포할 때 <font color="#c00000">producer를 지속적으로 수정해야 한다.</font> 때문에 계속해서 TEST를 해야 하는데 그 과정이 여간 불편한게 아니다. 매번 Ec2 키고 접속해서 주키퍼랑 카프카 올리고… 아무튼 생각보다 노력을 필요로 한다. 또 Github와 같이 <font color="#c00000">producer의 버전을 관리하고 다른 사람들에게 공유도 용이</font>하게 하기 위해서는 응당 구축해야할 것이 있다.</p>
 <p>그것이 바로.. CI/CD다!! Devops의 기본 소양이자 DE라면 당연히 알아야 하는 CI/CD를 구현해보기로 했다. 다행히도 학교에서 젠킨스를 이용한 CI/CD 구현 수업을 들었기에 개념 정도는 꿰고 있었다.</p>
 <blockquote>
-<p>CI/CD란?
+<p>CI/CD란? <br>
 지속적 통합/지속적 배포 라는 뜻으로 <font color="#c00000">코드 변경 사항을 자동으로 통합하고 배포하는 과정</font>을 말한다. 이를 통해 개발 과정이 자동화되어 개발자의 삶의 질을 향상시킨다. 지속적 통합(CI)은 코드 변경을 자주 통합하여 문제를 신속히 발견하고, 지속적 배포(CD)는 변경 사항을 자동으로 배포하여<font color="#c00000"> 사용자에게 빠르게 제공</font>할 수 있게 한다.</p>
 </blockquote>
 <p>본격적으로 시작해보자 <br></p>
@@ -110,15 +110,15 @@ b. (CodeDeploy 할당용) 배포를 위해 CodeDeploy가 가지는 권한. <br><
 <strong>IAM -> 역할 -> 역할생성</strong> <br></p>
 <div align="center">
     <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQNqsyIntaXbRKCxmcf_Z9r-Abe34AfYKDGNrgI1vCSdZ40?width=1024" alt="아키텍쳐">
-</div>
-그 후 아래와 같이 설정 <br>
+</div> <br>
+그 후 아래와 같이 설정
 <div align="center">
     <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQO7h4n1sBMXTb0r3cUVS_wNAUKQh08ymvDTGBcg3itiYco?width=1024" alt="아키텍쳐">
-</div>
+</div><br>
 AWSCodeDeployFullAccess 와 AmazonS3FullAccess 2개 선택 <br>
 <div align="center">
     <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQNi53WlbB_NR4xGnwe--w8PATwtAkMOar9T3XrpI4164yM?width=1024" alt="아키텍쳐">
-</div>
+</div><br>
 이름지정 
 <div align="center">
     <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQPGSdrNw4qlQrqHDkOl984nAeqsejEfMqOffkNUaHPH_kY?width=1024" alt="아키텍쳐">
@@ -163,7 +163,7 @@ AWSCodeDeployFullAccess 와 AmazonS3FullAccess 2개 선택 <br>
 </blockquote>
 <div align="center">
     <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQOBPhjqqNLMR6dv2mJibzX1Aeq4pvImkSMUitv8l8rfH0M?width=1024" alt="배포 유형 및 환경 구성">
-</div>
+</div><br>
 마지막으로 로드 밸런서 해제만 체크 해주면 비로소 Codedeploy 설정이 끝나게 된다. 우리는 CD 즉, 지속적 배포가 목적이기 때문에 로드 밸런서는 따로 필요하지 않다. 
 <div align="center">
     <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQNOB1rbSW0kT4_sXYCji7DEAfaMG5LiSHjAijUuLKkDVm8?width=1200&amp;height=280" alt="로드 밸런서">
@@ -193,7 +193,7 @@ AWSCodeDeployFullAccess 와 AmazonS3FullAccess 2개 선택 <br>
 <p>전 단계에서 만든 사용자 -> 엑세스 키 생성을 선택한다.</p>
 <div align="center">
     <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQNrZmzeyJROTYK7LreOLlp8ARJIfFVmyH6xJNw4ZwuuSak?width=1322&amp;height=548" alt="엑세스 키 생성">
-</div>
+</div><br>
 그럼 다음과 같이 <font color="#c00000">ACCESS KEY</font>와 <font color="#c00000">SECRET ACCESS KEY</font>가 만들어진다.
 <div align="center">
     <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQNVa_UAh0MRQaXVmeec5O_iAWHPbVQ9Vx0i0fz4eUWm9kk?width=1102&amp;height=544" alt="엑세스 키 저장">
