@@ -4,7 +4,7 @@ title: Implementing CI/CD with Github Actions CI + AWS CodeDeploy
 date: '2024-05-31 01:20:27'
 author: 최지혁
 tags: DevOps CI/CD
-categories: Data_Engineering
+categories: Data_Engineering Cloud
 ---
 ## 들어가기에 앞서
 이번에 AWS EC2를 이용해 NAT instance를 활용해 [kafka broker](https://statisticsfox.github.io/Cloud/)를 구축했다. 이제 producer를 실행하면 자연스럽게 카프카를 사용할 수 있다.(리소스 비용 이슈로 프로듀서 서버를 따로 분리하지 않았다.ㅎㅎ) 
