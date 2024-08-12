@@ -56,7 +56,7 @@ categories: Data_Engineering
 
 
 ## Terraform을 이용한 AKS 구성
-본인이 클라우드 환경에서 Potal 만지는게 어렵다?? 그럼 그냥 고개를 들어 Terraform을 보면 된다. <font color="#c00000">Terraform은 인프라를 코드로 관리할 수 있게 해주는 굉장히 편리한 도구</font>로 apply 딸깍 한번에 수많은 설정들이 적용되어 인프라 구축이 가능하다. 물론 러닝커브가 있으나 튜토리얼이 사례 별로 "아니 이 정도까지 친절하다고?"수준으로 잘 나와 있기에 그대로 따라하면된다. GPT가 필요 없을 정도로 친절하다.
+본인이 클라우드 환경에서 Portal 만지는게 어렵다?? 그럼 그냥 고개를 들어 Terraform을 보면 된다. <font color="#c00000">Terraform은 인프라를 코드로 관리할 수 있게 해주는 굉장히 편리한 도구</font>로 apply 딸깍 한번에 수많은 설정들이 적용되어 인프라 구축이 가능하다. 물론 러닝커브가 있으나 튜토리얼이 사례 별로 "아니 이 정도까지 친절하다고?"수준으로 잘 나와 있기에 그대로 따라하면된다. GPT가 필요 없을 정도로 친절하다.
 <br>
 [Terraform 튜토리얼](https://registry.terraform.io)<br>
 [Terraform 공식 docs](https://developer.hashicorp.com/terraform/docs)
