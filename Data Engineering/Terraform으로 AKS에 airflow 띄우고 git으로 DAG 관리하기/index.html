@@ -1,0 +1,592 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><meta name="generator" content="Gatsby 4.25.7"/><meta data-react-helmet="true" property="og:title" content="Terraform으로 AKS에 airflow 띄우고 git으로 DAG 관리하기"/><meta data-react-helmet="true" property="og:site_title" content="Terraform으로 AKS에 airflow 띄우고 git으로 DAG 관리하기"/><meta data-react-helmet="true" name="description" content="들어가기에 앞서 이번에 RAG를 이용한 채용정보 챗봇 구축을 위해 Azure 쿠버네티스 환경(통칭 AKS)에서 ETL 프로젝트를 해보기 위해 아래와 같은 계획을 짰다. 프로젝트 환경에 airflow를 띄우고 주기적인 크롤링 SPARK를 통한 데이터 마트 구축 GPT-3 토크나이저를 이용한 데이터 임베딩 크로마 DB에 데이터 적제 이거 할 생각에 잔뜩 기대하고 허겁지겁 일단 AKS 위에 쿠버네티스를 올린 후 pod에 airflow를 올리고 DAG를 GIT으로 관리할 수 있게끔 구성했다. ACR(Azure Container Registry)도 만들어 도커로 환경 배포까지 자동화를 해놨으나 결국 무산 되었다…
+그 이유는 바로 비용문제이다. 일단 내가 개발한 크롤러로 데이터를 수집하면 데이터의 형태가 다음과 같다. 여기서 문제가 바로 ‘detail_data’다. 이 데이터를 , , 그리고 프롬프트만해도 이 엄청나다. 근데 해당 기능은 필수적인 기능이라 데이터 엔지니어링 파트에서 비용 절감…"/><meta data-react-helmet="true" property="og:description" content="들어가기에 앞서 이번에 RAG를 이용한 채용정보 챗봇 구축을 위해 Azure 쿠버네티스 환경(통칭 AKS)에서 ETL 프로젝트를 해보기 위해 아래와 같은 계획을 짰다. 프로젝트 환경에 airflow를 띄우고 주기적인 크롤링 SPARK를 통한 데이터 마트 구축 GPT-3 토크나이저를 이용한 데이터 임베딩 크로마 DB에 데이터 적제 이거 할 생각에 잔뜩 기대하고 허겁지겁 일단 AKS 위에 쿠버네티스를 올린 후 pod에 airflow를 올리고 DAG를 GIT으로 관리할 수 있게끔 구성했다. ACR(Azure Container Registry)도 만들어 도커로 환경 배포까지 자동화를 해놨으나 결국 무산 되었다…
+그 이유는 바로 비용문제이다. 일단 내가 개발한 크롤러로 데이터를 수집하면 데이터의 형태가 다음과 같다. 여기서 문제가 바로 ‘detail_data’다. 이 데이터를 , , 그리고 프롬프트만해도 이 엄청나다. 근데 해당 기능은 필수적인 기능이라 데이터 엔지니어링 파트에서 비용 절감…"/><meta data-react-helmet="true" property="og:author" content="최지혁"/><meta data-react-helmet="true" property="og:image" content="/og-image.png"/><meta data-react-helmet="true" property="og:type" content="website"/><style data-href="/styles.9a445f4f44484af676fc.css" data-identity="gatsby-global-css">@font-face{font-display:swap;font-family:Montserrat;font-style:normal;font-weight:100;src:local("Montserrat Thin "),local("Montserrat-Thin"),url(/static/montserrat-latin-100-8d7d79679b70dbe27172b6460e7a7910.woff2) format("woff2"),url(/static/montserrat-latin-100-ec38980a9e0119a379e2a9b3dbb1901a.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:italic;font-weight:100;src:local("Montserrat Thin italic"),local("Montserrat-Thinitalic"),url(/static/montserrat-latin-100italic-e279051046ba1286706adc886cf1c96b.woff2) format("woff2"),url(/static/montserrat-latin-100italic-3b325a3173c8207435cd1b76e19bf501.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:normal;font-weight:200;src:local("Montserrat Extra Light "),local("Montserrat-Extra Light"),url(/static/montserrat-latin-200-9d266fbbfa6cab7009bd56003b1eeb67.woff2) format("woff2"),url(/static/montserrat-latin-200-2d8ba08717110d27122e54c34b8a5798.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:italic;font-weight:200;src:local("Montserrat Extra Light italic"),local("Montserrat-Extra Lightitalic"),url(/static/montserrat-latin-200italic-6e5b3756583bb2263eb062eae992735e.woff2) format("woff2"),url(/static/montserrat-latin-200italic-a0d6f343e4b536c582926255367a57da.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:normal;font-weight:300;src:local("Montserrat Light "),local("Montserrat-Light"),url(/static/montserrat-latin-300-00b3e893aab5a8fd632d6342eb72551a.woff2) format("woff2"),url(/static/montserrat-latin-300-ea303695ceab35f17e7d062f30e0173b.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:italic;font-weight:300;src:local("Montserrat Light italic"),local("Montserrat-Lightitalic"),url(/static/montserrat-latin-300italic-56f34ea368f6aedf89583d444bbcb227.woff2) format("woff2"),url(/static/montserrat-latin-300italic-54b0bf2c8c4c12ffafd803be2466a790.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:normal;font-weight:400;src:local("Montserrat Regular "),local("Montserrat-Regular"),url(/static/montserrat-latin-400-b71748ae4f80ec8c014def4c5fa8688b.woff2) format("woff2"),url(/static/montserrat-latin-400-0659a9f4e90db5cf51b50d005bff1e41.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:italic;font-weight:400;src:local("Montserrat Regular italic"),local("Montserrat-Regularitalic"),url(/static/montserrat-latin-400italic-6eed6b4cbb809c6efc7aa7ddad6dbe3e.woff2) format("woff2"),url(/static/montserrat-latin-400italic-7583622cfde30ae49086d18447ab28e7.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:normal;font-weight:500;src:local("Montserrat Medium "),local("Montserrat-Medium"),url(/static/montserrat-latin-500-091b209546e16313fd4f4fc36090c757.woff2) format("woff2"),url(/static/montserrat-latin-500-edd311588712a96bbf435fad264fff62.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:italic;font-weight:500;src:local("Montserrat Medium italic"),local("Montserrat-Mediumitalic"),url(/static/montserrat-latin-500italic-c90ced68b46050061d1a41842d6dfb43.woff2) format("woff2"),url(/static/montserrat-latin-500italic-5146cbfe02b1deea5dffea27a5f2f998.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:normal;font-weight:600;src:local("Montserrat SemiBold "),local("Montserrat-SemiBold"),url(/static/montserrat-latin-600-0480d2f8a71f38db8633b84d8722e0c2.woff2) format("woff2"),url(/static/montserrat-latin-600-b77863a375260a05dd13f86a1cee598f.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:italic;font-weight:600;src:local("Montserrat SemiBold italic"),local("Montserrat-SemiBolditalic"),url(/static/montserrat-latin-600italic-cf46ffb11f3a60d7df0567f8851a1d00.woff2) format("woff2"),url(/static/montserrat-latin-600italic-c4fcfeeb057724724097167e57bd7801.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:normal;font-weight:700;src:local("Montserrat Bold "),local("Montserrat-Bold"),url(/static/montserrat-latin-700-7dbcc8a5ea2289d83f657c25b4be6193.woff2) format("woff2"),url(/static/montserrat-latin-700-99271a835e1cae8c76ef8bba99a8cc4e.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:italic;font-weight:700;src:local("Montserrat Bold italic"),local("Montserrat-Bolditalic"),url(/static/montserrat-latin-700italic-c41ad6bdb4bd504a843d546d0a47958d.woff2) format("woff2"),url(/static/montserrat-latin-700italic-6779372f04095051c62ed36bc1dcc142.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:normal;font-weight:800;src:local("Montserrat ExtraBold "),local("Montserrat-ExtraBold"),url(/static/montserrat-latin-800-db9a3e0ba7eaea32e5f55328ace6cf23.woff2) format("woff2"),url(/static/montserrat-latin-800-4e3c615967a2360f5db87d2f0fd2456f.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:italic;font-weight:800;src:local("Montserrat ExtraBold italic"),local("Montserrat-ExtraBolditalic"),url(/static/montserrat-latin-800italic-bf45bfa14805969eda318973947bc42b.woff2) format("woff2"),url(/static/montserrat-latin-800italic-fe82abb0bcede51bf724254878e0c374.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:normal;font-weight:900;src:local("Montserrat Black "),local("Montserrat-Black"),url(/static/montserrat-latin-900-e66c7edc609e24bacbb705175669d814.woff2) format("woff2"),url(/static/montserrat-latin-900-8211f418baeb8ec880b80ba3c682f957.woff) format("woff")}@font-face{font-display:swap;font-family:Montserrat;font-style:italic;font-weight:900;src:local("Montserrat Black italic"),local("Montserrat-Blackitalic"),url(/static/montserrat-latin-900italic-4454c775e48152c1a72510ceed3603e2.woff2) format("woff2"),url(/static/montserrat-latin-900italic-efcaa0f6a82ee0640b83a0916e6e8d68.woff) format("woff")}.search-input-wrapper{align-items:center;display:none;margin-top:3px;width:180px}@media(min-width:768px){.search-input-wrapper{display:flex}}.search-icon{color:var(--primary-text-color);margin-right:2px}.search-input{height:100%;width:100%}.search-input .MuiAutocomplete-inputRoot{padding-right:0!important}.search-input .MuiInputBase-input{color:var(--primary-text-color)!important;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;font-size:16px;font-weight:500;padding-bottom:2px!important}.search-input .MuiInput-underline:before{border-bottom-color:var(--primary-text-color);border-bottom-width:1px}.search-input .MuiInput-underline:after{border-bottom-color:var(--primary-text-color)}.page-header-wrapper{display:flex;height:60px;justify-content:center;width:100%}.page-header-wrapper .page-header{align-items:center;display:flex;justify-content:space-between;max-width:720px;width:100%}.page-header-wrapper .page-header .link{color:var(--primary-text-color);font-size:17px;font-weight:700}@media(min-width:768px){.page-header-wrapper .page-header .link{font-size:20px;font-weight:700}}.page-header-wrapper .page-header .trailing-section{align-items:center;display:flex}.page-header-wrapper .page-header .trailing-section .link{margin-right:10px}@media(min-width:768px){.page-header-wrapper .page-header .trailing-section .link{margin-right:20px}}.page-footer-wrapper{align-items:center;display:flex;height:62px;justify-content:center;margin-top:auto;width:100%}.page-footer-wrapper .page-footer{max-width:720px;text-align:center;width:100%}.page-footer-wrapper .page-footer .link{color:var(--primary-text-color);font-size:20px;font-weight:700;margin-right:20px}.page-footer-wrapper .page-footer a{color:#3a95ff}.dark-mode-button-wrapper{align-items:center;bottom:20px;display:flex;justify-content:center;position:fixed;right:20px}.dark-mode-button{-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);background-color:#363f47!important;border-radius:50px;box-shadow:0 5px 25px rgba(0,0,0,.12);cursor:pointer;height:50px;width:50px;z-index:3}.dark-mode-icon{color:#fff}a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{border:0;font-size:100%;font:inherit;margin:0;padding:0;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:"";content:none}table{border-collapse:collapse;border-spacing:0}a{outline:none;text-decoration:none}html{--background-color:#fff;--primary-text-color:#000;--secondary-text-color:#9e9e9e;--content-text-color:#37352f;--button-background-color:#f3f3f4;--button-text-color:#363f47;--tab-text-color:#6e6d7a;--tab-hover-text-color:#0d0c22;--tab-selected-background-color:rgba(13,12,34,.05);--bio-link-icon-color:rgba(0,0,0,.54);--about-link-icon-color:#a8a8a8;--chip-background-color:#f3f3f4;--link-text-color:rgba(55,53,47,.7);--post-card-border-color:rgba(0,0,0,.12);--markdown-table-even-cell-background-color:#f6f8fa;--markdown-table-border-color:#dfe2e5;--markdown-blockquote-border-color:#dfe2e5;--markdown-border-color:#e1e4e8}html[data-theme=dark]{--background-color:#232326;--primary-text-color:#e6e6e6;--secondary-text-color:#768390;--content-text-color:#e6e6e6;--button-background-color:#444c56;--button-text-color:#363f47;--tab-text-color:#768390;--tab-hover-text-color:#acbac7;--tab-selected-background-color:#373e47;--chip-background-color:#323a42;--bio-link-icon-color:#e6e6e6;--about-link-icon-color:#a8a8a8;--link-text-color:#90b0ec;--post-card-border-color:#363f47;--markdown-table-even-cell-background-color:#2d333b;--markdown-table-border-color:#444c56;--markdown-blockquote-border-color:#4f5864;--markdown-border-color:#e1e4e8}*{-webkit-appearance:none;appearance:none;box-sizing:border-box}html{font-size:14px;height:100%;overflow-y:scroll;width:100%}body{background-color:var(--background-color)!important}a{color:var(--link-text-color)}.page-wrapper{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;color:var(--primary-text-color);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;justify-content:center;min-height:100vh;padding-left:15px;padding-right:15px;word-break:keep-all}.page-wrapper,.page-wrapper .page-content{align-items:center;display:flex;flex-direction:column;width:100%}.page-wrapper .page-content{max-width:720px}.icon{color:var(--about-link-icon-color);font-size:20px}.social-links .icon{color:var(--bio-link-icon-color);font-size:30px}@keyframes blinking-cursor{0%{opacity:0}50%{opacity:1}to{opacity:0}}.bio{color:var(--primary-text-color);display:flex;flex-direction:column;justify-content:space-between;margin-bottom:120px;margin-top:120px;width:100%}@media(min-width:768px){.bio{align-items:center;flex-direction:row}}.bio .introduction{display:flex;flex-direction:column;word-break:keep-all}.bio .introduction .react-rotating-text-cursor{animation:blinking-cursor .8s cubic-bezier(.68,.01,.01,.99) 0s infinite}.bio .introduction strong{display:inline-block;font-weight:600}.bio .introduction.korean{font-size:32px;font-weight:100;line-height:1.2}.bio .introduction.korean .title .react-rotating-text-cursor{font-size:35px;line-height:35px}@media(min-width:768px){.bio .introduction.korean{font-size:40px}.bio .introduction.korean .title .react-rotating-text-cursor{font-size:45px;line-height:45px}}.bio .introduction.english{font-family:montserrat;font-size:25px;line-height:1.2}@media(min-width:768px){.bio .introduction.english{font-size:45px}}.bio .introduction.english .name{font-size:35px;font-weight:600}.bio .introduction.english .job{font-size:35px}.bio .introduction.english .description{font-size:20px;font-weight:200;margin-top:8px}.bio .introduction.english .social-links{display:flex;margin-top:20px}.bio .thumbnail-wrapper{display:none}@media(min-width:768px){.bio .thumbnail-wrapper{display:block}}.section-header-wrapper{display:flex;justify-content:center;margin-bottom:32px;width:100%}.section-header-wrapper .section-header{border-bottom:4px solid var(--primary-text-color);color:var(--primary-text-color);font-size:30px;font-weight:700;padding-bottom:5px}.timestamp-section{align-items:center;display:flex;flex-direction:column;justify-content:center;margin-bottom:50px;width:100%;word-break:keep-all}.timestamp-section .body{padding:0 10px;width:100%}.timestamp-section .body .timestamp{border-left:2px solid #bdbdbd;display:flex;font-size:18px;font-weight:400;justify-items:center;margin-left:5px;padding:10px 0;width:100%}.timestamp-section .body .timestamp:first-child{padding-top:7px}.timestamp-section .body .timestamp:last-child{padding-bottom:7px}.timestamp-section .body .timestamp:before{align-self:center;background-color:var(--background-color);border:2px solid #828282;border-radius:10px;content:"";height:10px;left:-1px;position:relative;transform:translatex(-50%);width:10px}.timestamp-section .body .timestamp .date{align-self:center;color:#828282;margin-left:5px;margin-right:5px;min-width:115px;width:115px}@media(min-width:768px){.timestamp-section .body .timestamp .date{min-width:200px;width:200px}}.timestamp-section .body .timestamp .activity{line-height:23px;width:100%}.project-section{align-items:center;justify-content:center}.project-section,.project-section .project{display:flex;flex-direction:column;width:100%}.project-section .project{margin-bottom:30px;padding:15px}.project-section .project .head{font-size:20px;font-weight:700;line-height:30px;margin-bottom:10px}.project-section .project .body{display:flex;flex-direction:column;width:100%}.project-section .project .body .thumbnail{margin-bottom:10px;width:100%}.project-section .project .body .tech-stack{display:flex;margin-bottom:10px}.project-section .project .body .tech-stack .tech{background-color:var(--chip-background-color);border-radius:10px;font-size:15px;font-weight:500;margin-right:5px;padding:5px 7px}.project-section .project .body .description{font-size:16px;font-weight:400;line-height:1.4}@media(min-width:768px){.project-section .project .body{flex-direction:column}.project-section .project .body .content{margin-top:0}}.post-header{border-bottom:1px solid var(--post-card-border-color);display:flex;flex-direction:column;justify-content:center;margin-bottom:40px;margin-top:20px;padding-bottom:10px;width:100%;word-break:keep-all}.post-header .emoji{font-size:78px;margin-bottom:20px}.post-header .categories{margin-bottom:5px}.post-header .categories .category{color:var(--primary-text-color);font-weight:600;margin-right:4px}.post-header .categories .category:hover{text-decoration:underline}.post-header .title{color:var(--primary-text-color);font-size:32px;font-weight:600;line-height:1.3;margin-bottom:6px}.post-header .info{color:var(--secondary-text-color);display:flex;flex-wrap:wrap;font-size:16px;font-weight:500;line-height:1.5;width:100%}.post-header .info .author{margin-right:4px}.post-header .info strong{color:var(--primary-text-color);font-weight:600}.post-navigator{column-gap:1.4%;display:grid;grid-template-columns:49.3% 49.3%;width:100%}.post-navigator .post-card{border:1px solid var(--post-card-border-color);border-radius:6px;color:var(--primary-text-color);cursor:pointer;display:flex;flex-direction:column;padding:15px;transition:transform .2s;width:100%}.post-navigator .post-card:hover .title{text-decoration:underline}.post-navigator .post-card.prev{margin-right:auto}.post-navigator .post-card.next{margin-left:auto}.post-navigator .post-card .direction{color:gray;font-size:14px;font-weight:500;margin-bottom:5px}.post-navigator .post-card .title{font-size:16px;font-weight:600;line-height:1.4;margin-bottom:7px}.markdown .octicon{fill:currentColor;display:inline-block;vertical-align:text-bottom}.markdown .anchor{float:left;line-height:1;margin-left:-20px;padding-right:4px}.markdown .anchor:focus{outline:none}.markdown h1 .octicon-link,.markdown h2 .octicon-link,.markdown h3 .octicon-link,.markdown h4 .octicon-link,.markdown h5 .octicon-link,.markdown h6 .octicon-link{color:#1b1f23;vertical-align:middle;visibility:hidden}.markdown h1:hover .anchor,.markdown h2:hover .anchor,.markdown h3:hover .anchor,.markdown h4:hover .anchor,.markdown h5:hover .anchor,.markdown h6:hover .anchor{text-decoration:none}.markdown h1:hover .anchor .octicon-link,.markdown h2:hover .anchor .octicon-link,.markdown h3:hover .anchor .octicon-link,.markdown h4:hover .anchor .octicon-link,.markdown h5:hover .anchor .octicon-link,.markdown h6:hover .anchor .octicon-link{visibility:visible}.markdown h1:hover .anchor .octicon-link:before,.markdown h2:hover .anchor .octicon-link:before,.markdown h3:hover .anchor .octicon-link:before,.markdown h4:hover .anchor .octicon-link:before,.markdown h5:hover .anchor .octicon-link:before,.markdown h6:hover .anchor .octicon-link:before{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' aria-hidden='true' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z'/%3E%3C/svg%3E");content:" ";display:inline-block;height:16px;width:16px}.markdown{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;word-wrap:break-word;color:var(--content-text-color);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;font-size:16px;font-weight:500;line-height:1.5}.markdown details{display:block}.markdown summary{display:list-item}.markdown a{background-color:initial}.markdown a:active,.markdown a:hover{outline-width:0}.markdown strong{font-weight:inherit;font-weight:bolder}.markdown h1{margin:.67em 0}.markdown img{border-style:none}.markdown code,.markdown kbd,.markdown pre{font-family:monospace,monospace;font-size:1em}.markdown hr{box-sizing:initial;overflow:visible}.markdown input{font:inherit;margin:0;overflow:visible}.markdown [type=checkbox]{box-sizing:border-box;padding:0}.markdown *{box-sizing:border-box}.markdown input{font-family:inherit;font-size:inherit;line-height:inherit}.markdown a{border-bottom:.05em solid;border-color:var(--link-text-color);color:var(--link-text-color);text-decoration:none}.markdown a.anchor{border-bottom:none}.markdown strong{font-weight:700}.markdown hr{background:transparent;border-bottom:1px solid var(--markdown-blockquote-border-color);height:0;margin:15px 0;overflow:hidden}.markdown hr:after,.markdown hr:before{content:"";display:table}.markdown hr:after{clear:both}.markdown table{border-collapse:collapse;border-spacing:0}.markdown td,.markdown th{padding:0}.markdown details summary{cursor:pointer}.markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{margin-bottom:0;margin-top:0}.markdown h1{font-size:32px}.markdown h1,.markdown h2{font-weight:600}.markdown h2{font-size:24px}.markdown h3{font-size:20px}.markdown h3,.markdown h4{font-weight:600}.markdown h4{font-size:16px}.markdown h5{font-size:14px}.markdown h5,.markdown h6{font-weight:600}.markdown h6{font-size:12px}.markdown p{margin-bottom:10px;margin-top:0}.markdown blockquote{margin:0}.markdown ol,.markdown ul{margin-bottom:0;margin-top:0;padding-left:0}.markdown ol ol,.markdown ul ol{list-style-type:lower-roman}.markdown ol ol ol,.markdown ol ul ol,.markdown ul ol ol,.markdown ul ul ol{list-style-type:lower-alpha}.markdown dd{margin-left:0}.markdown code,.markdown pre{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;font-size:12px}.markdown code.language-text{border-radius:3px;font-size:85%;padding:.2em .4em}.markdown :not(pre)>code.language-text{background:hsla(44,6%,50%,.15);color:#eb5757;overflow-wrap:break-word}.markdown pre{margin-bottom:0;margin-top:0}.markdown input::-webkit-inner-spin-button,.markdown input::-webkit-outer-spin-button{-webkit-appearance:none;appearance:none;margin:0}.markdown :checked+.radio-label{border-color:#0366d6;position:relative;z-index:1}.markdown .border{border:1px solid var(--markdown-border-color)!important}.markdown .border-0{border:0!important}.markdown .border-bottom{border-bottom:1px solid var(--markdown-border-color)!important}.markdown .rounded-1{border-radius:3px!important}.markdown .bg-white{background-color:transparent!important}.markdown .bg-gray-light{background-color:#fafbfc!important}.markdown .text-gray-light{color:#6a737d!important}.markdown .pl-3,.markdown .px-3{padding-left:16px!important}.markdown .px-3{padding-right:16px!important}.markdown .f6{font-size:12px!important}.markdown .lh-condensed{line-height:1.25!important}.markdown .text-bold{font-weight:600!important}.markdown .pl-c{color:#6a737d}.markdown .pl-c1,.markdown .pl-s .pl-v{color:#005cc5}.markdown .pl-e,.markdown .pl-en{color:#6f42c1}.markdown .pl-s .pl-s1,.markdown .pl-smi{color:#24292e}.markdown .pl-ent{color:#22863a}.markdown .pl-k{color:#d73a49}.markdown .pl-pds,.markdown .pl-s,.markdown .pl-s .pl-pse .pl-s1,.markdown .pl-sr,.markdown .pl-sr .pl-cce,.markdown .pl-sr .pl-sra,.markdown .pl-sr .pl-sre{color:#032f62}.markdown .pl-smw,.markdown .pl-v{color:#e36209}.markdown .pl-bu{color:#b31d28}.markdown .pl-ii{background-color:#b31d28;color:#fafbfc}.markdown .pl-c2{background-color:#d73a49;color:#fafbfc}.markdown .pl-c2:before{content:"^M"}.markdown .pl-sr .pl-cce{color:#22863a;font-weight:700}.markdown .pl-ml{color:#735c0f}.markdown .pl-mh,.markdown .pl-mh .pl-en,.markdown .pl-ms{color:#005cc5;font-weight:700}.markdown .pl-mi{color:#24292e;font-style:italic}.markdown .pl-mb{color:#24292e;font-weight:700}.markdown .pl-md{background-color:#ffeef0;color:#b31d28}.markdown .pl-mi1{background-color:#f0fff4;color:#22863a}.markdown .pl-mc{background-color:#ffebda;color:#e36209}.markdown .pl-mi2{background-color:#005cc5;color:#f6f8fa}.markdown .pl-mdr{color:#6f42c1;font-weight:700}.markdown .pl-ba{color:#586069}.markdown .pl-sg{color:#959da5}.markdown .pl-corl{color:#032f62;text-decoration:underline}.markdown .mb-0{margin-bottom:0!important}.markdown .my-2{margin-bottom:8px!important;margin-top:8px!important}.markdown .pl-0{padding-left:0!important}.markdown .py-0{padding-bottom:0!important;padding-top:0!important}.markdown .pl-1{padding-left:4px!important}.markdown .pl-2{padding-left:8px!important}.markdown .py-2{padding-bottom:8px!important;padding-top:8px!important}.markdown .pl-3{padding-left:16px!important}.markdown .pl-4{padding-left:24px!important}.markdown .pl-5{padding-left:32px!important}.markdown .pl-6{padding-left:40px!important}.markdown .pl-7{padding-left:48px!important}.markdown .pl-8{padding-left:64px!important}.markdown .pl-9{padding-left:80px!important}.markdown .pl-10{padding-left:96px!important}.markdown .pl-11{padding-left:112px!important}.markdown .pl-12{padding-left:128px!important}.markdown hr{border-bottom-color:#eee}.markdown kbd{background-color:#fafbfc;border:1px solid #d1d5da;border-radius:3px;box-shadow:inset 0 -1px 0 #d1d5da;color:#444d56;display:inline-block;font:11px SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;line-height:10px;padding:3px 5px;vertical-align:middle}.markdown:after,.markdown:before{content:"";display:table}.markdown:after{clear:both}.markdown>:first-child{margin-top:0!important}.markdown>:last-child{margin-bottom:0!important}.markdown a:not([href]){color:inherit;text-decoration:none}.markdown blockquote,.markdown details,.markdown dl,.markdown ol,.markdown p,.markdown pre,.markdown table,.markdown ul{margin-bottom:16px;margin-top:0}.markdown hr{background-color:var(--markdown-border-color);border:0;height:.25em;margin:24px 0;padding:0}.markdown blockquote{border-left:.25em solid var(--markdown-blockquote-border-color);color:#6a737d;padding:0 1em}.markdown blockquote>:first-child{margin-top:0}.markdown blockquote>:last-child{margin-bottom:0}.markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{font-weight:600;line-height:1.25;margin-bottom:16px;margin-top:24px}.markdown h1{font-size:2em}.markdown h2{font-size:1.5em}.markdown h3{font-size:1.25em}.markdown h4{font-size:1em}.markdown h5{font-size:.875em}.markdown h6{color:#6a737d;font-size:.85em}.markdown ol,.markdown ul{padding-left:2em}.markdown ol ol,.markdown ol ul,.markdown ul ol,.markdown ul ul{margin-bottom:0;margin-top:0}.markdown ol{list-style-type:decimal}.markdown ul{list-style-type:disc}.markdown li{word-wrap:break-all;display:list-item;text-align:-webkit-match-parent}.markdown li>p{margin-top:16px}.markdown li+li{margin-top:.25em}.markdown dl{padding:0}.markdown dl dt{font-size:1em;font-style:italic;font-weight:600;margin-top:16px;padding:0}.markdown dl dd{margin-bottom:16px;padding:0 16px}.markdown table{display:block;overflow:auto;width:100%}.markdown table th{font-weight:600}.markdown table td,.markdown table th{border:1px solid var(--markdown-table-border-color);padding:6px 13px}.markdown table tr{border-top:1px solid var(--markdown-table-border-color)}.markdown table tr:nth-child(2n){background-color:var(--markdown-table-even-cell-background-color)}.markdown img{background-color:transparent;box-sizing:initial;display:block;margin:0 auto;max-width:100%}.markdown img[align=right]{padding-left:20px}.markdown img[align=left]{padding-right:20px}.markdown code{background-color:rgba(27,31,35,.05);border-radius:3px;font-size:85%;margin:0;padding:.2em .4em}.markdown pre{word-wrap:normal}.markdown pre>code{background:transparent;border:0;font-size:100%;margin:0;padding:0;white-space:pre;word-break:normal}.markdown .highlight{margin-bottom:16px}.markdown .highlight pre{margin-bottom:0;word-break:normal}.markdown .highlight pre,.markdown pre{background-color:#f6f8fa;border-radius:3px;font-size:85%;line-height:1.45;overflow:auto;padding:16px}.markdown pre code{word-wrap:normal;background-color:initial;border:0;display:inline;line-height:inherit;margin:0;max-width:auto;overflow:visible;padding:0}.markdown .commit-tease-sha{color:#444d56;display:inline-block;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;font-size:90%}.markdown .full-commit .btn-outline:not(:disabled):hover{border-color:#005cc5;color:#005cc5}.markdown .blob-wrapper{overflow-x:auto;overflow-y:hidden}.markdown .blob-wrapper-embedded{max-height:240px;overflow-y:auto}.markdown .blob-num{color:rgba(27,31,35,.3);cursor:pointer;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;font-size:12px;line-height:20px;min-width:50px;padding-left:10px;padding-right:10px;text-align:right;-webkit-user-select:none;user-select:none;vertical-align:top;white-space:nowrap;width:1%}.markdown .blob-num:hover{color:rgba(27,31,35,.6)}.markdown .blob-num:before{content:attr(data-line-number)}.markdown .blob-code{line-height:20px;padding-left:10px;padding-right:10px;position:relative;vertical-align:top}.markdown .blob-code-inner{word-wrap:normal;color:#24292e;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;font-size:12px;overflow:visible;white-space:pre}.markdown .pl-token.active,.markdown .pl-token:hover{background:#ffea7f;cursor:pointer}.markdown .tab-size[data-tab-size="1"]{tab-size:1}.markdown .tab-size[data-tab-size="2"]{tab-size:2}.markdown .tab-size[data-tab-size="3"]{tab-size:3}.markdown .tab-size[data-tab-size="4"]{tab-size:4}.markdown .tab-size[data-tab-size="5"]{tab-size:5}.markdown .tab-size[data-tab-size="6"]{tab-size:6}.markdown .tab-size[data-tab-size="7"]{tab-size:7}.markdown .tab-size[data-tab-size="8"]{tab-size:8}.markdown .tab-size[data-tab-size="9"]{tab-size:9}.markdown .tab-size[data-tab-size="10"]{tab-size:10}.markdown .tab-size[data-tab-size="11"]{tab-size:11}.markdown .tab-size[data-tab-size="12"]{tab-size:12}.markdown .task-list-item{list-style-type:none}.markdown .task-list-item+.task-list-item{margin-top:3px}.markdown .task-list-item input{margin:0 .2em .25em -1.6em;vertical-align:middle}.markdown .table-of-contents{align-items:flex-start;display:flex;flex-direction:column;justify-content:center;position:fixed;right:0;top:75px;width:340px}@media(max-width:1300px){.markdown .table-of-contents{display:none}}.markdown .table-of-contents ul{cursor:pointer;list-style-type:none}.markdown .table-of-contents ul li a{border-bottom:none;color:var(--secondary-text-color);font-size:14px;height:30px;padding:6px 2px;width:100%}.markdown .table-of-contents ul p{margin:0}.markdown .gatsby-resp-image-wrapper{display:flex!important;justify-content:center!important;max-height:560px!important;width:100%!important}.markdown .gatsby-resp-image-wrapper img{height:auto!important;max-height:560px!important;max-width:100%!important;position:relative!important;width:auto!important}.markdown .gatsby-resp-image-wrapper+em{color:#6a737d;display:block;font-size:15px;font-style:italic;text-align:center}code[class*=language-],pre[class*=language-]{word-wrap:normal;background:none;color:#ccc;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;font-size:1em;-webkit-hyphens:none;hyphens:none;line-height:1.5;tab-size:4;text-align:left;white-space:pre;word-break:normal;word-spacing:normal}pre[class*=language-]{margin:.5em 0;overflow:auto;padding:1em}:not(pre)>code[class*=language-],pre[class*=language-]{background:#2d2d2d}:not(pre)>code[class*=language-]{border-radius:.3em;padding:.1em;white-space:normal}.token.block-comment,.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#999}.token.punctuation{color:#ccc}.token.attr-name,.token.deleted,.token.namespace,.token.tag{color:#e2777a}.token.function-name{color:#6196cc}.token.boolean,.token.function,.token.number{color:#f08d49}.token.class-name,.token.constant,.token.property,.token.symbol{color:#f8c555}.token.atrule,.token.builtin,.token.important,.token.keyword,.token.selector{color:#cc99cd}.token.attr-value,.token.char,.token.regex,.token.string,.token.variable{color:#7ec699}.token.entity,.token.operator,.token.url{color:#67cdcc}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}.token.inserted{color:green}.post-content{margin-bottom:20px;width:100%}.category-page-header-wrapper,.post-content{display:flex;flex-direction:column;justify-content:center}.category-page-header-wrapper{align-items:center;margin-bottom:30px;margin-top:30px}.category-page-header-wrapper .category-page-title{border-bottom:3px solid var(--primary-text-color);font-size:40px;font-weight:700;margin-bottom:15px;padding-bottom:7px;text-align:center;width:-webkit-fit-content;width:-moz-fit-content;width:fit-content}.category-page-header-wrapper .category-page-subtitle{font-size:20px;font-weight:500;padding-bottom:10px;text-align:center}.post-card-wrapper{display:flex;justify-content:center;min-height:150px;width:100%}.post-card-wrapper .post-card{border:1px solid var(--post-card-border-color);border-radius:6px;color:var(--primary-text-color);cursor:pointer;display:flex;flex-direction:column;height:100%;margin-bottom:15px;max-width:720px;padding:15px;transition:transform .2s;width:100%}.post-card-wrapper .post-card:hover .title{text-decoration:underline}@media(min-width:768px){.post-card-wrapper .post-card{margin-bottom:0}}.post-card-wrapper .post-card .title{font-size:18px;font-weight:600;line-height:1.4;margin-bottom:7px}.post-card-wrapper .post-card .description{-webkit-line-clamp:3;-webkit-box-orient:vertical;color:var(--primary-text-color);display:-webkit-box;font-size:13px;line-height:20px;margin-bottom:10px;overflow:hidden;text-overflow:ellipsis}.post-card-wrapper .post-card .info{color:var(--about-link-icon-color);display:flex;font-size:14px;justify-content:space-between;margin-top:auto}.post-card-wrapper .post-card .info .categories{display:flex}.post-card-wrapper .post-card .info .categories .category{margin-left:4px}.post-card-wrapper .post-card .info .categories .category:hover{text-decoration:underline}.post-card-column-wrapper{display:flex;justify-content:center;width:100%}.post-card-column-wrapper .post-card-column{align-items:center;display:flex;flex-direction:column;width:100%}.post-card-column-wrapper .post-card-column .post-card-wrapper{margin-bottom:10px}.post-card-column-wrapper .post-card-column .more-post-card-button{background-color:var(--button-background-color);color:var(--tab-hover-text-color);font-size:15px;font-weight:500;height:40px}.post-tabs-wrapper{align-self:flex-start;display:flex;flex-direction:column;justify-content:center;top:0;width:100%}.post-tabs-wrapper .post-tabs{display:flex;height:40px;justify-content:center;margin-bottom:12px;max-width:760px;width:100%}.post-tabs-wrapper .post-tabs .mui-tabs .MuiTab-root{color:var(--tab-text-color);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;font-size:17px;font-weight:500;height:40px;min-height:auto;min-width:auto;padding:10px 12px;transition:all .2s ease}.post-tabs-wrapper .post-tabs .mui-tabs .Mui-selected,.post-tabs-wrapper .post-tabs .mui-tabs .MuiTab-root :hover{color:var(--tab-hover-text-color);transition:all .2s ease}.post-tabs-wrapper .post-tabs .mui-tabs .Mui-selected{background-color:var(--tab-selected-background-color);border-radius:8px;font-weight:600}.post-tabs-wrapper .post-tabs .mui-tabs .MuiTabScrollButton-root{height:40px;width:20px}.post-tabs-wrapper .post-tabs .mui-tabs .MuiTabs-scrollable{height:40px}.post-tabs-wrapper .post-tabs .mui-tabs .MuiTabs-indicator{display:none}</style><style data-emotion="css-global o6gwfi">html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:rgba(0, 0, 0, 0.87);font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:400;font-size:1rem;line-height:1.5;letter-spacing:0.00938em;background-color:#fff;}@media print{body{background-color:#fff;}}body::backdrop{background-color:#fff;}</style><style data-emotion="css-global 1prfaxn">@-webkit-keyframes mui-auto-fill{from{display:block;}}@keyframes mui-auto-fill{from{display:block;}}@-webkit-keyframes mui-auto-fill-cancel{from{display:block;}}@keyframes mui-auto-fill-cancel{from{display:block;}}</style><style data-emotion="css 18nc3u2 feqhe6 12rx5qu mnn31 vubbuv 1yxmbwk 6flbmm">.css-18nc3u2.Mui-focused .MuiAutocomplete-clearIndicator{visibility:visible;}@media (pointer: fine){.css-18nc3u2:hover .MuiAutocomplete-clearIndicator{visibility:visible;}}.css-18nc3u2 .MuiAutocomplete-tag{margin:3px;max-width:calc(100% - 6px);}.css-18nc3u2 .MuiAutocomplete-inputRoot{-webkit-box-flex-wrap:wrap;-webkit-flex-wrap:wrap;-ms-flex-wrap:wrap;flex-wrap:wrap;}.MuiAutocomplete-hasPopupIcon.css-18nc3u2 .MuiAutocomplete-inputRoot,.MuiAutocomplete-hasClearIcon.css-18nc3u2 .MuiAutocomplete-inputRoot{padding-right:30px;}.MuiAutocomplete-hasPopupIcon.MuiAutocomplete-hasClearIcon.css-18nc3u2 .MuiAutocomplete-inputRoot{padding-right:56px;}.css-18nc3u2 .MuiAutocomplete-inputRoot .MuiAutocomplete-input{width:0;min-width:30px;}.css-18nc3u2 .MuiInput-root{padding-bottom:1px;}.css-18nc3u2 .MuiInput-root .MuiInput-input{padding:4px 4px 4px 0px;}.css-18nc3u2 .MuiInput-root.MuiInputBase-sizeSmall .MuiInput-input{padding:2px 4px 3px 0;}.css-18nc3u2 .MuiOutlinedInput-root{padding:9px;}.MuiAutocomplete-hasPopupIcon.css-18nc3u2 .MuiOutlinedInput-root,.MuiAutocomplete-hasClearIcon.css-18nc3u2 .MuiOutlinedInput-root{padding-right:39px;}.MuiAutocomplete-hasPopupIcon.MuiAutocomplete-hasClearIcon.css-18nc3u2 .MuiOutlinedInput-root{padding-right:65px;}.css-18nc3u2 .MuiOutlinedInput-root .MuiAutocomplete-input{padding:7.5px 4px 7.5px 5px;}.css-18nc3u2 .MuiOutlinedInput-root .MuiAutocomplete-endAdornment{right:9px;}.css-18nc3u2 .MuiOutlinedInput-root.MuiInputBase-sizeSmall{padding-top:6px;padding-bottom:6px;padding-left:6px;}.css-18nc3u2 .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-input{padding:2.5px 4px 2.5px 8px;}.css-18nc3u2 .MuiFilledInput-root{padding-top:19px;padding-left:8px;}.MuiAutocomplete-hasPopupIcon.css-18nc3u2 .MuiFilledInput-root,.MuiAutocomplete-hasClearIcon.css-18nc3u2 .MuiFilledInput-root{padding-right:39px;}.MuiAutocomplete-hasPopupIcon.MuiAutocomplete-hasClearIcon.css-18nc3u2 .MuiFilledInput-root{padding-right:65px;}.css-18nc3u2 .MuiFilledInput-root .MuiFilledInput-input{padding:7px 4px;}.css-18nc3u2 .MuiFilledInput-root .MuiAutocomplete-endAdornment{right:9px;}.css-18nc3u2 .MuiFilledInput-root.MuiInputBase-sizeSmall{padding-bottom:1px;}.css-18nc3u2 .MuiFilledInput-root.MuiInputBase-sizeSmall .MuiFilledInput-input{padding:2.5px 4px;}.css-18nc3u2 .MuiInputBase-hiddenLabel{padding-top:8px;}.css-18nc3u2 .MuiFilledInput-root.MuiInputBase-hiddenLabel{padding-top:0;padding-bottom:0;}.css-18nc3u2 .MuiFilledInput-root.MuiInputBase-hiddenLabel .MuiAutocomplete-input{padding-top:16px;padding-bottom:17px;}.css-18nc3u2 .MuiFilledInput-root.MuiInputBase-hiddenLabel.MuiInputBase-sizeSmall .MuiAutocomplete-input{padding-top:8px;padding-bottom:9px;}.css-18nc3u2 .MuiAutocomplete-input{-webkit-box-flex:1;-webkit-flex-grow:1;-ms-flex-positive:1;flex-grow:1;text-overflow:ellipsis;opacity:1;}.css-feqhe6{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;position:relative;min-width:0;padding:0;margin:0;border:0;vertical-align:top;width:100%;}.css-12rx5qu{font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:400;font-size:1rem;line-height:1.4375em;letter-spacing:0.00938em;color:rgba(0, 0, 0, 0.87);box-sizing:border-box;position:relative;cursor:text;display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;width:100%;position:relative;}.css-12rx5qu.Mui-disabled{color:rgba(0, 0, 0, 0.38);cursor:default;}label+.css-12rx5qu{margin-top:16px;}.css-12rx5qu:after{border-bottom:2px solid #1976d2;left:0;bottom:0;content:"";position:absolute;right:0;-webkit-transform:scaleX(0);-moz-transform:scaleX(0);-ms-transform:scaleX(0);transform:scaleX(0);-webkit-transition:-webkit-transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;transition:transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;pointer-events:none;}.css-12rx5qu.Mui-focused:after{-webkit-transform:scaleX(1) translateX(0);-moz-transform:scaleX(1) translateX(0);-ms-transform:scaleX(1) translateX(0);transform:scaleX(1) translateX(0);}.css-12rx5qu.Mui-error:before,.css-12rx5qu.Mui-error:after{border-bottom-color:#d32f2f;}.css-12rx5qu:before{border-bottom:1px solid rgba(0, 0, 0, 0.42);left:0;bottom:0;content:"\00a0";position:absolute;right:0;-webkit-transition:border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;pointer-events:none;}.css-12rx5qu:hover:not(.Mui-disabled, .Mui-error):before{border-bottom:2px solid rgba(0, 0, 0, 0.87);}@media (hover: none){.css-12rx5qu:hover:not(.Mui-disabled, .Mui-error):before{border-bottom:1px solid rgba(0, 0, 0, 0.42);}}.css-12rx5qu.Mui-disabled:before{border-bottom-style:dotted;}.css-mnn31{font:inherit;letter-spacing:inherit;color:currentColor;padding:4px 0 5px;border:0;box-sizing:content-box;background:none;height:1.4375em;margin:0;-webkit-tap-highlight-color:transparent;display:block;min-width:0;width:100%;-webkit-animation-name:mui-auto-fill-cancel;animation-name:mui-auto-fill-cancel;-webkit-animation-duration:10ms;animation-duration:10ms;}.css-mnn31::-webkit-input-placeholder{color:currentColor;opacity:0.42;-webkit-transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.css-mnn31::-moz-placeholder{color:currentColor;opacity:0.42;-webkit-transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.css-mnn31:-ms-input-placeholder{color:currentColor;opacity:0.42;-webkit-transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.css-mnn31::-ms-input-placeholder{color:currentColor;opacity:0.42;-webkit-transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.css-mnn31:focus{outline:0;}.css-mnn31:invalid{box-shadow:none;}.css-mnn31::-webkit-search-decoration{-webkit-appearance:none;}label[data-shrink=false]+.MuiInputBase-formControl .css-mnn31::-webkit-input-placeholder{opacity:0!important;}label[data-shrink=false]+.MuiInputBase-formControl .css-mnn31::-moz-placeholder{opacity:0!important;}label[data-shrink=false]+.MuiInputBase-formControl .css-mnn31:-ms-input-placeholder{opacity:0!important;}label[data-shrink=false]+.MuiInputBase-formControl .css-mnn31::-ms-input-placeholder{opacity:0!important;}label[data-shrink=false]+.MuiInputBase-formControl .css-mnn31:focus::-webkit-input-placeholder{opacity:0.42;}label[data-shrink=false]+.MuiInputBase-formControl .css-mnn31:focus::-moz-placeholder{opacity:0.42;}label[data-shrink=false]+.MuiInputBase-formControl .css-mnn31:focus:-ms-input-placeholder{opacity:0.42;}label[data-shrink=false]+.MuiInputBase-formControl .css-mnn31:focus::-ms-input-placeholder{opacity:0.42;}.css-mnn31.Mui-disabled{opacity:1;-webkit-text-fill-color:rgba(0, 0, 0, 0.38);}.css-mnn31:-webkit-autofill{-webkit-animation-duration:5000s;animation-duration:5000s;-webkit-animation-name:mui-auto-fill;animation-name:mui-auto-fill;}.css-vubbuv{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;width:1em;height:1em;display:inline-block;fill:currentColor;-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;-webkit-transition:fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;font-size:1.5rem;}.css-1yxmbwk{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;-webkit-justify-content:center;justify-content:center;position:relative;box-sizing:border-box;-webkit-tap-highlight-color:transparent;background-color:transparent;outline:0;border:0;margin:0;border-radius:0;padding:0;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-moz-appearance:none;-webkit-appearance:none;-webkit-text-decoration:none;text-decoration:none;color:inherit;text-align:center;-webkit-flex:0 0 auto;-ms-flex:0 0 auto;flex:0 0 auto;font-size:1.5rem;padding:8px;border-radius:50%;overflow:visible;color:rgba(0, 0, 0, 0.54);-webkit-transition:background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.css-1yxmbwk::-moz-focus-inner{border-style:none;}.css-1yxmbwk.Mui-disabled{pointer-events:none;cursor:default;}@media print{.css-1yxmbwk{-webkit-print-color-adjust:exact;color-adjust:exact;}}.css-1yxmbwk:hover{background-color:rgba(0, 0, 0, 0.04);}@media (hover: none){.css-1yxmbwk:hover{background-color:transparent;}}.css-1yxmbwk.Mui-disabled{background-color:transparent;color:rgba(0, 0, 0, 0.26);}.css-6flbmm{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;width:1em;height:1em;display:inline-block;fill:currentColor;-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;-webkit-transition:fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;font-size:2.1875rem;}</style><link rel="preconnect" href="https://www.google-analytics.com"/><link rel="dns-prefetch" href="https://www.google-analytics.com"/><script>
+  
+  function gaOptout(){document.cookie=disableStr+'=true; expires=Thu, 31 Dec 2099 23:59:59 UTC;path=/',window[disableStr]=!0}var gaProperty='G-G2RSZRF7WX',disableStr='ga-disable-'+gaProperty;document.cookie.indexOf(disableStr+'=true')>-1&&(window[disableStr]=!0);
+  if(true) {
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  }
+  if (typeof ga === "function") {
+    ga('create', 'G-G2RSZRF7WX', 'auto', {});
+      ga('set', 'anonymizeIp', true);
+      
+      
+      
+      
+      }</script><link rel="icon" href="/favicon-32x32.png?v=143078f955a82fd28b44b42161701fef" type="image/png"/><link rel="manifest" href="/manifest.webmanifest" crossorigin="anonymous"/><link rel="apple-touch-icon" sizes="48x48" href="/icons/icon-48x48.png?v=143078f955a82fd28b44b42161701fef"/><link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png?v=143078f955a82fd28b44b42161701fef"/><link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png?v=143078f955a82fd28b44b42161701fef"/><link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png?v=143078f955a82fd28b44b42161701fef"/><link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png?v=143078f955a82fd28b44b42161701fef"/><link rel="apple-touch-icon" sizes="256x256" href="/icons/icon-256x256.png?v=143078f955a82fd28b44b42161701fef"/><link rel="apple-touch-icon" sizes="384x384" href="/icons/icon-384x384.png?v=143078f955a82fd28b44b42161701fef"/><link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png?v=143078f955a82fd28b44b42161701fef"/><style type="text/css">
+    .anchor.before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translateX(-100%);
+      padding-right: 4px;
+    }
+    .anchor.after {
+      display: inline-block;
+      padding-left: 4px;
+    }
+    h1 .anchor svg,
+    h2 .anchor svg,
+    h3 .anchor svg,
+    h4 .anchor svg,
+    h5 .anchor svg,
+    h6 .anchor svg {
+      visibility: hidden;
+    }
+    h1:hover .anchor svg,
+    h2:hover .anchor svg,
+    h3:hover .anchor svg,
+    h4:hover .anchor svg,
+    h5:hover .anchor svg,
+    h6:hover .anchor svg,
+    h1 .anchor:focus svg,
+    h2 .anchor:focus svg,
+    h3 .anchor:focus svg,
+    h4 .anchor:focus svg,
+    h5 .anchor:focus svg,
+    h6 .anchor:focus svg {
+      visibility: visible;
+    }
+  </style><script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+      var hash = window.decodeURI(location.hash.replace('#', ''))
+      if (hash !== '') {
+        var element = document.getElementById(hash)
+        if (element) {
+          var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+          var clientTop = document.documentElement.clientTop || document.body.clientTop || 0
+          var offset = element.getBoundingClientRect().top + scrollTop - clientTop
+          // Wait for the browser to finish rendering before scrolling.
+          setTimeout((function() {
+            window.scrollTo(0, offset - 0)
+          }), 0)
+        }
+      }
+    })
+  </script><link rel="preload" as="font" type="font/woff2" crossorigin="anonymous" href="/static/webfonts/s/roboto/v32/KFOlCnqEu92Fr1MmSU5fBBc4.woff2"/><link rel="preload" as="font" type="font/woff2" crossorigin="anonymous" href="/static/webfonts/s/roboto/v32/KFOmCnqEu92Fr1Mu4mxK.woff2"/><link rel="preload" as="font" type="font/woff2" crossorigin="anonymous" href="/static/webfonts/s/roboto/v32/KFOlCnqEu92Fr1MmEU9fBBc4.woff2"/><style>@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:300;src:url(/static/webfonts/s/roboto/v32/KFOlCnqEu92Fr1MmSU5fBBc4.woff2) format("woff2")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:400;src:url(/static/webfonts/s/roboto/v32/KFOmCnqEu92Fr1Mu4mxK.woff2) format("woff2")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:500;src:url(/static/webfonts/s/roboto/v32/KFOlCnqEu92Fr1MmEU9fBBc4.woff2) format("woff2")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:300;src:url(/static/webfonts/s/roboto/v32/KFOlCnqEu92Fr1MmSU5fBBc-.woff) format("woff")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:400;src:url(/static/webfonts/s/roboto/v32/KFOmCnqEu92Fr1Mu4mxM.woff) format("woff")}@font-face{font-display:swap;font-family:Roboto;font-style:normal;font-weight:500;src:url(/static/webfonts/s/roboto/v32/KFOlCnqEu92Fr1MmEU9fBBc-.woff) format("woff")}</style><link rel="sitemap" type="application/xml" href="/sitemap.xml"/><style>.gatsby-image-wrapper{position:relative;overflow:hidden}.gatsby-image-wrapper picture.object-fit-polyfill{position:static!important}.gatsby-image-wrapper img{bottom:0;height:100%;left:0;margin:0;max-width:none;padding:0;position:absolute;right:0;top:0;width:100%;object-fit:cover}.gatsby-image-wrapper [data-main-image]{opacity:0;transform:translateZ(0);transition:opacity .25s linear;will-change:opacity}.gatsby-image-wrapper-constrained{display:inline-block;vertical-align:top}</style><noscript><style>.gatsby-image-wrapper noscript [data-main-image]{opacity:1!important}.gatsby-image-wrapper [data-placeholder-image]{opacity:0!important}</style></noscript><script type="module">const e="undefined"!=typeof HTMLImageElement&&"loading"in HTMLImageElement.prototype;e&&document.body.addEventListener("load",(function(e){const t=e.target;if(void 0===t.dataset.mainImage)return;if(void 0===t.dataset.gatsbyImageSsr)return;let a=null,n=t;for(;null===a&&n;)void 0!==n.parentNode.dataset.gatsbyImageWrapper&&(a=n.parentNode),n=n.parentNode;const o=a.querySelector("[data-placeholder-image]"),r=new Image;r.src=t.currentSrc,r.decode().catch((()=>{})).then((()=>{t.style.opacity=1,o&&(o.style.opacity=0,o.style.transition="opacity 500ms linear")}))}),!0);</script><title data-react-helmet="true">Terraform으로 AKS에 airflow 띄우고 git으로 DAG 관리하기</title></head><body><div id="___gatsby"><div style="outline:none" tabindex="-1" id="gatsby-focus-wrapper"><div class="page-wrapper"><header class="page-header-wrapper"><div class="page-header"><div class="front-section"><a class="link" href="/">지혁이의 데엔일기</a></div><div class="trailing-section"><a class="link" href="/about">about</a><a class="link" href="/posts">posts</a><div class="MuiAutocomplete-root MuiAutocomplete-hasPopupIcon css-18nc3u2"><div class="search-input-wrapper"><div class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root search-input css-feqhe6"><div class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedEnd MuiAutocomplete-inputRoot css-12rx5qu"><input type="text" aria-invalid="false" autoComplete="off" value="" class="MuiInputBase-input MuiInput-input MuiInputBase-inputAdornedEnd MuiAutocomplete-input MuiAutocomplete-inputFocused css-mnn31" aria-autocomplete="list" aria-expanded="false" autoCapitalize="none" spellcheck="false" role="combobox"/><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium search-icon css-vubbuv" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="SearchOutlinedIcon"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg></div></div></div></div></div></div></header><main class="page-content"><header class="post-header"><div class="emoji">🍤</div><div class="info"><div class="categories"><a class="category" href="/posts/Data_Engineering">Data_Engineering</a></div></div><h1 class="title">Terraform으로 AKS에 airflow 띄우고 git으로 DAG 관리하기</h1><div class="info"><div class="author">posted by <strong>최지혁</strong>,</div> <!-- -->August 11, 2024</div></header><div class="post-content"><div class="markdown"><h2 id="들어가기에-앞서" style="position:relative;"><a href="#%EB%93%A4%EC%96%B4%EA%B0%80%EA%B8%B0%EC%97%90-%EC%95%9E%EC%84%9C" aria-label="들어가기에 앞서 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>들어가기에 앞서</h2>
+<p>이번에 RAG를 이용한 채용정보 챗봇 구축을 위해 Azure 쿠버네티스 환경(통칭 AKS)에서 ETL 프로젝트를 해보기 위해 아래와 같은 계획을 짰다.</p>
+<ol>
+<li>프로젝트 환경에 airflow를 띄우고 주기적인 크롤링</li>
+<li>SPARK를 통한 데이터 마트 구축</li>
+<li>GPT-3 토크나이저를 이용한 데이터 임베딩</li>
+<li>크로마 DB에 데이터 적제</li>
+</ol>
+<p>이거 할 생각에 잔뜩 기대하고 허겁지겁 일단 AKS 위에 쿠버네티스를 올린 후 pod에 airflow를 올리고 DAG를 GIT으로 관리할 수 있게끔 구성했다. ACR(Azure Container Registry)도 만들어 도커로 환경 배포까지 자동화를 해놨으나 <font color="#c00000">결국 무산 되었다…</font><br><br>
+그 이유는 바로 비용문제이다. 일단 내가 개발한 크롤러로 데이터를 수집하면 데이터의 형태가 다음과 같다.</p>
+<div class="gatsby-highlight" data-language="json"><pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"Datetime"</span><span class="token operator">:</span> <span class="token string">"2024-08-10"</span><span class="token punctuation">,</span>
+    <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"[강동/통근] 삼성E&amp;A 비서/사무보조 사원 채용"</span><span class="token punctuation">,</span>
+    <span class="token property">"URL"</span><span class="token operator">:</span> <span class="token string">"https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&amp;rec_idx=48782490&amp;location=ts&amp;searchType=search&amp;paid_fl=n&amp;search_uuid=004d110a-a231-41c0-92da-9655708bbb41"</span><span class="token punctuation">,</span>
+    <span class="token property">"metadata"</span><span class="token operator">:</span> <span class="token string">"(주)에스이에스, [강동/통근] 삼성E&amp;A 비서/사무보조 사원 채용, 경력:경력무관, 학력:학력무관, 연봉:2,960 만원, 마감일:2024-08-19, 홈페이지:www.seshr.co.kr"</span><span class="token punctuation">,</span>
+    <span class="token property">"end_date"</span><span class="token operator">:</span> <span class="token string">"2024-08-19,"</span><span class="token punctuation">,</span>
+    <span class="token property">"start_date"</span><span class="token operator">:</span> <span class="token string">"2024.08.09 14:00"</span><span class="token punctuation">,</span>
+    <span class="token property">"Work_history"</span><span class="token operator">:</span> <span class="token string">"무관(신입포함)"</span><span class="token punctuation">,</span>
+    <span class="token property">"Education"</span><span class="token operator">:</span> <span class="token string">"학력무관"</span><span class="token punctuation">,</span>
+    <span class="token property">"Job_type"</span><span class="token operator">:</span> <span class="token string">"계약직, 파견직\n상세보기"</span><span class="token punctuation">,</span>
+    <span class="token property">"Salary"</span><span class="token operator">:</span> <span class="token string">"연봉 2,960 만원 (주 40시간)"</span><span class="token punctuation">,</span>
+    <span class="token property">"근무형태"</span><span class="token operator">:</span> <span class="token string">"상세보기"</span><span class="token punctuation">,</span>
+    <span class="token property">"working time"</span><span class="token operator">:</span> <span class="token string">"주 5일(월~금) 08:00~17:00"</span><span class="token punctuation">,</span>
+    <span class="token property">"working area"</span><span class="token operator">:</span> <span class="token string">"서울 강동구 지도"</span><span class="token punctuation">,</span>
+    <span class="token property">"Co_name"</span><span class="token operator">:</span> <span class="token string">"(주)에스이에스"</span><span class="token punctuation">,</span>
+    <span class="token property">"img_list"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"detail_data"</span><span class="token operator">:</span> <span class="token string">"[강동/통근] 삼성E&amp;A\n비서/사무보조 사원 모집\n모집부문 및 상세내용\n공통 자격요건\nㆍ학력 : 무관\n비서행정 1명\n     담당업무\n    ㆍ비서 업무\n    ㆍ팀 서무 업무(팀 공통 업무 지원)\n    ㆍ예산 및 월별 결산 지원(경비처리, 계산서 등)\n    ㆍ출장 지원(비자신청 및 예약 등)\n\n 자격사항\nㆍ동종업계 경력자 우대\nㆍMS-Office(워드/엑셀/파워포인트) 능통자 우대\nㆍ경리업무 경험자(SAP 또는 ERP시스템 유경험자 우대)\nㆍ근거리 거주자 우대\n\n  ■ 삼성그룹사 경력 쌓을 수 있습니다.\n  ■ 면접합격 이후 빠른 출근 가능\n  ■ 서울,경기,인천권 통근버스 운행\n  ■ 경력 증명서 발급 가능\n\n근무조건\n\n\n근무형태 : 파견계약직 (12개월/연장 시 최대 2년까지 근무가능) \n근무일시 : 주 5일(월~금) 08:00 ~ 17:00 (점심시간 11:30 ~ 13:30 中 1시간)\n근무지역 : 서울 강동구 상일로 6길 26 글로벌엔지니어링센터(상일동역 인근)\n급여수준 : 2,224,000원(세전) + 명절상여금 별도 (설날/추석 각 148만 연 2회) + 연차수당 별도(잔여 발생 시)  = 연봉기준 약 2,960만\n\n복리후생 : 명절상여금(연 2회/근속기간 무관) / 4대보험 / 연차수당 / 경조휴가 / 명절선물 등\n \n\n전형절차\n서류전형\n1차면접\n최종합격\n접수기간 및 방법\nㆍ 접수기간 : ~ 2024년 08월 19일 (월) 09시\nㆍ 접수방법 : 사람인 입사지원 또는  sh0722@seshr.co.kr 메일 접수\nㆍ 이력서양식 : 자사양식 (첨부파일 참조) \n유의사항\nㆍ입사지원 서류에 허위사실이 발견될 경우, 채용확정 이후라도 채용이 취소될 수 있습니다."</span>
+<span class="token punctuation">}</span></code></pre></div>
+<p>여기서 문제가 바로 ‘detail_data’다. 이 데이터를 <code class="language-text">임베딩하는데 드는 비용</code>, <code class="language-text">학습시키는데 드는 비용</code>, 그리고 프롬프트만해도 <code class="language-text">API 비용</code>이 엄청나다. 근데 해당 기능은 필수적인 기능이라 데이터 엔지니어링 파트에서 비용 절감을 하는 수밖에 없었고 쿠버네티스를 사용하지 않기로 했다.ㅜㅜㅜ(<del>데엔의 희생..</del>)  <br><br>
+이거 어떻게 할까 알아보는데 <font color="#c00000">EKS는 노드 풀 단계에서 부터 서버리스가 가능</font>한 반면 <font color="#0096FF">AKS</font>는 노드 풀 비용은 필수 그리고 그 후 <font color="#0096FF">스케일 아웃에서만 서버리스가 제공</font>된다는 사실을 알았다. <del>Azure 싫어하는거 아닌데 뭔가 맛이 없다.</del>
+다만 우리는 한이음 멘토님이 마소 현역이라 AWS 금지령이 내려져서 울며 겨자먹기로 Azure를 써야 하는 상황이다.</p>
+<p>결국 그냥 AzureFunction을 사용해서 주기적으로 크롤링을 하고 VM 하나 띄워서 그 안에 Chroma DB를 띄우기로 했다.</p>
+<p>그래서 이미 진행한 AKS 구축해 둔게 아무쓸모가 없어졌다! 때문에 이대로 폭파시키기는 너무 아쉬워 그 과정을 기록해 두고자 한다.
+<br>
+그럼 시작해보자.</p>
+<div align="center">
+    <img src="https://onedrive.live.com/embed?resid=9DED56BE8CF81C92%21211&amp;authkey=%21AInaQqp_g1hhKd0&amp;width=564&amp;height=311" alt="시작해보자">
+</div>
+<h2 id="prerequisites" style="position:relative;"><a href="#prerequisites" aria-label="prerequisites permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Prerequisites</h2>
+<p>해당 패키지들이 설치되어 있는지 우선 확인하자</p>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli">az cli</a>가 설치되어 있는지</li>
+<li>.kubectl를 설치했는지 <a href="https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#connect-to-the-cluster">az aks install-cli.</a></li>
+<li><a href="https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli">Terraform CLI</a>가 설치되어 있는지.</li>
+</ul>
+<h2 id="terraform을-이용한-aks-구성" style="position:relative;"><a href="#terraform%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-aks-%EA%B5%AC%EC%84%B1" aria-label="terraform을 이용한 aks 구성 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Terraform을 이용한 AKS 구성</h2>
+<p>본인이 클라우드 환경에서 Potal 만지는게 어렵다?? 그럼 그냥 고개를 들어 Terraform을 보면 된다. <font color="#c00000">Terraform은 인프라를 코드로 관리할 수 있게 해주는 굉장히 편리한 도구</font>로 apply 딸깍 한번에 수많은 설정들이 적용되어 인프라 구축이 가능하다. 물론 러닝커브가 있으나 튜토리얼이 사례 별로 “아니 이 정도까지 친절하다고?”수준으로 잘 나와 있기에 그대로 따라하면된다. GPT가 필요 없을 정도로 친절하다.
+<br>
+<a href="https://registry.terraform.io">Terraform 튜토리얼</a><br>
+<a href="https://developer.hashicorp.com/terraform/docs">Terraform 공식 docs</a></p>
+<p>그럼 코드를 보도록 하자</p>
+<h3 id="providerstf" style="position:relative;"><a href="#providerstf" aria-label="providerstf permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>providers.tf</h3>
+<p>providers는 가장 기초적인 파일로 기본적인 패키지나 설정 그리고 내가 어떤 플랫폼의 인프라를 사용할 것인지 사전 정의를 해두는 파일이다.</p>
+<div class="gatsby-highlight" data-language="json"><pre class="language-json"><code class="language-json">provider <span class="token string">"azurerm"</span> <span class="token punctuation">{</span>
+  skip_provider_registration = <span class="token string">"true"</span>
+  features <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+terraform <span class="token punctuation">{</span>
+  required_version = <span class="token string">">=1.0"</span>
+
+  required_providers <span class="token punctuation">{</span>
+    azapi = <span class="token punctuation">{</span>
+      source  = <span class="token string">"azure/azapi"</span>
+      version = <span class="token string">"~>1.5"</span>
+    <span class="token punctuation">}</span>
+    azurerm = <span class="token punctuation">{</span>
+      source  = <span class="token string">"hashicorp/azurerm"</span>
+      version = <span class="token string">"~>3.0"</span>
+    <span class="token punctuation">}</span>
+    random = <span class="token punctuation">{</span>
+      source  = <span class="token string">"hashicorp/random"</span>
+      version = <span class="token string">"~>3.0"</span>
+    <span class="token punctuation">}</span>
+    time = <span class="token punctuation">{</span>
+      source  = <span class="token string">"hashicorp/time"</span>
+      version = <span class="token string">"0.9.1"</span>
+    <span class="token punctuation">}</span>
+    helm = <span class="token punctuation">{</span>
+      source  = <span class="token string">"hashicorp/helm"</span>
+      version = <span class="token string">"~>2.0"</span>
+    <span class="token punctuation">}</span>
+    kubernetes = <span class="token punctuation">{</span>
+      source  = <span class="token string">"hashicorp/kubernetes"</span>
+      version = <span class="token string">"~>2.0"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+provider <span class="token string">"kubernetes"</span> <span class="token punctuation">{</span>
+  host                   = azurerm_kubernetes_cluster.aks_cluster.kube_config<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>.host
+  client_certificate     = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>.client_certificate)
+  client_key             = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>.client_key)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>.cluster_ca_certificate)
+<span class="token punctuation">}</span>
+
+provider <span class="token string">"helm"</span> <span class="token punctuation">{</span>
+  kubernetes <span class="token punctuation">{</span>
+    host                   = azurerm_kubernetes_cluster.aks_cluster.kube_config<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>.host
+    client_certificate     = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>.client_certificate)
+    client_key             = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>.client_key)
+    cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>.cluster_ca_certificate)
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div>
+<h3 id="variablestf" style="position:relative;"><a href="#variablestf" aria-label="variablestf permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>variables.tf</h3>
+<p>main.tf에 정의될 변수들을 미리 선언해둔 파일이다.</p>
+<div class="gatsby-highlight" data-language="json"><pre class="language-json"><code class="language-json">variable <span class="token string">"app_name"</span> <span class="token punctuation">{</span>
+  type        = string
+  description = <span class="token string">"name of the application"</span>
+<span class="token punctuation">}</span>
+
+variable <span class="token string">"location"</span> <span class="token punctuation">{</span>
+  type        = string
+  description = <span class="token string">"location for the resources"</span>
+<span class="token punctuation">}</span></code></pre></div>
+<h3 id="maintfvals" style="position:relative;"><a href="#maintfvals" aria-label="maintfvals permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>main.tfvals</h3>
+<p>variables.tf에 선언된 변수들의 실재값이다.</p>
+<div class="gatsby-highlight" data-language="json"><pre class="language-json"><code class="language-json">app_name = <span class="token string">"airflow"</span>
+location = <span class="token string">"koreacentral"</span></code></pre></div>
+<h3 id="maintf" style="position:relative;"><a href="#maintf" aria-label="maintf permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>main.tf</h3>
+<p>해당 파일은 내가 생송하고자 하는 플렛폼과 제품에 따라서 전부 다르기에 따로 리뷰는 하지 않겠다. 위에있는 terraform 가이드를 살펴보고 스스로 구축을 해보면 된다.
+간단하게만 언급하면 아래와 같다.</p>
+<ul>
+<li>Airflow 로그를 저장하기 위한 Blob 컨테이너를 프로비저닝 코드</li>
+<li>이미지를 가져오기 위한 ACR 프로비저닝 코드</li>
+<li>리소스 그룹 프로비저닝 코드</li>
+<li>기본 노드 풀이 있는 Kubernetes 클러스터 정의</li>
+</ul>
+<div class="gatsby-highlight" data-language="json"><pre class="language-json"><code class="language-json">resource <span class="token string">"azurerm_resource_group"</span> <span class="token string">"rg"</span> <span class="token punctuation">{</span>
+  name     = <span class="token string">"${var.app_name}rg"</span>
+  location = var.location
+<span class="token punctuation">}</span>
+
+# Azure Kubernetes Cluster
+
+resource <span class="token string">"azurerm_kubernetes_cluster"</span> <span class="token string">"main"</span> <span class="token punctuation">{</span>
+  name                = <span class="token string">"${var.app_name}aks"</span>
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  dns_prefix          = <span class="token string">"${var.app_name}-aks"</span>
+
+  default_node_pool <span class="token punctuation">{</span>
+    name       = <span class="token string">"default"</span>
+    node_count = <span class="token number">1</span>
+    vm_size    = <span class="token string">"Standard_DS2_v2"</span>
+  <span class="token punctuation">}</span>
+
+  identity <span class="token punctuation">{</span>
+    type = <span class="token string">"SystemAssigned"</span>
+  <span class="token punctuation">}</span>
+
+  storage_profile <span class="token punctuation">{</span>
+    blob_driver_enabled = <span class="token boolean">true</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+# Azure Container Registry
+
+resource <span class="token string">"azurerm_container_registry"</span> <span class="token string">"acr"</span> <span class="token punctuation">{</span>
+  name                = <span class="token string">"${var.app_name}acregistry"</span>
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+  sku                 = <span class="token string">"Standard"</span>
+  admin_enabled       = <span class="token boolean">true</span>
+<span class="token punctuation">}</span>
+
+resource <span class="token string">"azurerm_role_assignment"</span> <span class="token string">"main"</span> <span class="token punctuation">{</span>
+  principal_id         = azurerm_kubernetes_cluster.main.kubelet_identity<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>.object_id
+  role_definition_name = <span class="token string">"AcrPull"</span>
+  scope                = azurerm_container_registry.acr.id
+<span class="token punctuation">}</span>
+
+# Blob storage for Airflow logs
+
+resource <span class="token string">"azurerm_storage_account"</span> <span class="token string">"airflow"</span> <span class="token punctuation">{</span>
+  name                     = <span class="token string">"${var.app_name}airflowlogs"</span>
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = var.location
+  account_tier             = <span class="token string">"Standard"</span>
+  account_replication_type = <span class="token string">"LRS"</span>
+<span class="token punctuation">}</span>
+
+resource <span class="token string">"azurerm_storage_container"</span> <span class="token string">"airflow_logs"</span> <span class="token punctuation">{</span>
+  name                  = <span class="token string">"airflow-logs"</span>
+  storage_account_name  = azurerm_storage_account.airflow.name
+  container_access_type = <span class="token string">"private"</span>
+<span class="token punctuation">}</span>
+
+resource <span class="token string">"azurerm_storage_management_policy"</span> <span class="token string">"prune_logs"</span> <span class="token punctuation">{</span>
+  storage_account_id = azurerm_storage_account.airflow.id
+
+  rule <span class="token punctuation">{</span>
+    name    = <span class="token string">"prune-logs"</span>
+    enabled = <span class="token boolean">true</span>
+    filters <span class="token punctuation">{</span>
+      prefix_match = <span class="token punctuation">[</span><span class="token string">"airflow-logs"</span><span class="token punctuation">]</span>
+      blob_types   = <span class="token punctuation">[</span><span class="token string">"blockBlob"</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+    actions <span class="token punctuation">{</span>
+      base_blob <span class="token punctuation">{</span>
+        delete_after_days_since_modification_greater_than = <span class="token number">7</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div>
+<h2 id="azure-인프라-배포를-위한-서비스-주체-생성" style="position:relative;"><a href="#azure-%EC%9D%B8%ED%94%84%EB%9D%BC-%EB%B0%B0%ED%8F%AC%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%A3%BC%EC%B2%B4-%EC%83%9D%EC%84%B1" aria-label="azure 인프라 배포를 위한 서비스 주체 생성 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Azure 인프라 배포를 위한 서비스 주체 생성</h2>
+<p>Azure에 인프라를 배포하려면 먼저 인프라를 배포할 권한이 있는 서비스 주체를 만들어야 한다. 아래처럼 진행해주자.</p>
+<div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">az login
+
+export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+export SERVICE_PRINCIPAL_NAME=&quot;InfrastructureAccount&quot;
+
+az ad sp create-for-rbac \
+    --name $SERVICE_PRINCIPAL_NAME \
+    --role &quot;Owner&quot; \
+    --scopes &quot;/subscriptions/$SUBSCRIPTION_ID&quot; &gt; credentials.json</code></pre></div>
+<blockquote>
+<p><font color="#c00000">주의!⚠️⚠️⚠️⚠️⚠️⚠️</font> <br>
+다만 credentials.json의 내용은 비밀로 유지해야 한다. 공개적으로 노출하지 않도록 해야 하기에 혹시라도 github에 게시할 때는 <code class="language-text">.gitignore</code>을 사용 하도록 하자.</p>
+</blockquote>
+<p>또한 Terraform이 서비스 주체로 인증하려면 일부 환경 변수를 설정해야 하는데 아래 코드를 통해 진행 가능하다.</p>
+<div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">export ARM_CLIENT_ID=`cat credentials.json | python -c &#39;import json,sys;obj=json.load(sys.stdin);print(obj[&quot;appId&quot;])&#39;`
+export ARM_CLIENT_SECRET=`cat credentials.json | python -c &#39;import json,sys;obj=json.load(sys.stdin);print(obj[&quot;password&quot;])&#39;`
+export ARM_TENANT_ID=`cat credentials.json | python -c &#39;import json,sys;obj=json.load(sys.stdin);print(obj[&quot;tenant&quot;])&#39;`
+export ARM_SUBSCRIPTION_ID=`az account show --query id -o tsv`</code></pre></div>
+<h2 id="aks-클러스터-배포" style="position:relative;"><a href="#aks-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0-%EB%B0%B0%ED%8F%AC" aria-label="aks 클러스터 배포 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>AKS 클러스터 배포</h2>
+<p>이제 배포를 해보자</p>
+<div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">terraform init
+terraform fmt
+terraform validate
+terraform plan
+terraform apply</code></pre></div>
+<p>그럼 생각보다 오래걸리는데 그동안 유튜브 한편 보고와도 좋다.</p>
+<div align="center">
+    <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQMBrL5LviN7QqpIXek04U-uAZtjNP0bDt0Mqceq2lxFbbY?width=1024" alt="생성중">
+</div>
+그럼 이렇게 생성되었다고 초록색으로 글씨가 나올 것이다.
+<div align="center">
+    <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQOwZsSusgahRbOkT2cYObDhATPZGsIU8T2y7KTQlE_vxB0?width=1024" alt="생성완료">
+</div>
+<p>이제 모든 포트를 나열해보자</p>
+<div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">NAMESPACE     NAME                                  READY   STATUS    RESTARTS   AGE
+kube-system   azure-ip-masq-agent-58pln             1/1     Running   0          20h
+kube-system   cloud-node-manager-glrh9              1/1     Running   0          20h
+kube-system   coredns-76b9877f49-8h6cz              1/1     Running   0          20h
+kube-system   coredns-76b9877f49-pjjdb              1/1     Running   0          20h
+kube-system   coredns-autoscaler-85f7d6b75d-wdbwd   1/1     Running   0          20h
+kube-system   csi-azuredisk-node-mmpxj              3/3     Running   0          20h
+kube-system   csi-azurefile-node-sbw7j              3/3     Running   0          20h
+kube-system   csi-blob-node-jhtnr                   3/3     Running   0          17h
+kube-system   konnectivity-agent-659478b8b7-gpkwv   1/1     Running   0          20h
+kube-system   konnectivity-agent-659478b8b7-zqksv   1/1     Running   0          20h
+kube-system   kube-proxy-c48c8                      1/1     Running   0          20h
+kube-system   metrics-server-c456c67cb-dqv8f        2/2     Running   0          20h
+kube-system   metrics-server-c456c67cb-r9f82        2/2     Running   0          20h</code></pre></div>
+<h2 id="helm을-사용하여-airflow-설치" style="position:relative;"><a href="#helm%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-airflow-%EC%84%A4%EC%B9%98" aria-label="helm을 사용하여 airflow 설치 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Helm을 사용하여 Airflow 설치</h2>
+<p>이제 <a href="https://github.com/apache/airflow/tree/main/chart">Airflow Helm 차트</a>를 이용해서 Airflow를 설치해보자</p>
+<p>먼저 아래와 같은 <code class="language-text">valuse.yaml</code> 파일을 만들어준다.</p>
+<h3 id="valuesyaml" style="position:relative;"><a href="#valuesyaml" aria-label="valuesyaml permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>values.yaml</h3>
+<div class="gatsby-highlight" data-language="yaml"><pre class="language-yaml"><code class="language-yaml">
+<span class="token comment"># Select certain nodes for airflow pods.</span>
+<span class="token key atrule">nodeSelector</span><span class="token punctuation">:</span>
+  <span class="token key atrule">agentpool</span><span class="token punctuation">:</span> default
+
+<span class="token comment"># Airflow executor</span>
+<span class="token key atrule">executor</span><span class="token punctuation">:</span> <span class="token string">'KubernetesExecutor'</span>
+
+<span class="token comment"># Environment variables for all airflow containers</span>
+<span class="token key atrule">env</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> ENVIRONMENT
+    <span class="token key atrule">value</span><span class="token punctuation">:</span> dev
+
+<span class="token key atrule">extraEnv</span><span class="token punctuation">:</span> <span class="token punctuation">|</span><span class="token scalar string">
+  - name: AIRFLOW__CORE__DEFAULT_TIMEZONE
+    value: 'Asia/Seoul'</span>
+
+<span class="token comment"># Configuration for postgresql subchart</span>
+<span class="token comment"># Not recommended for production! Instead, spin up your own Postgresql server and use the `data`</span>
+<span class="token comment"># attribute in this yaml file.</span>
+<span class="token key atrule">postgresql</span><span class="token punctuation">:</span>
+  <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+
+<span class="token comment"># Enable pgbouncer.</span>
+<span class="token comment"># See https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#pgbouncer</span>
+<span class="token key atrule">pgbouncer</span><span class="token punctuation">:</span>
+  <span class="token key atrule">enabled</span><span class="token punctuation">:</span> true<span class="token punctuation">></span></code></pre></div>
+<h2 id="dag를-동기화하기-위한-gitsync" style="position:relative;"><a href="#dag%EB%A5%BC-%EB%8F%99%EA%B8%B0%ED%99%94%ED%95%98%EA%B8%B0-%EC%9C%84%ED%95%9C-gitsync" aria-label="dag를 동기화하기 위한 gitsync permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>DAG를 동기화하기 위한 GitSync</h2>
+<p>이제 DAG와 Github Repo를 동기화 해주어야 한다. 그 과정에서 SSH 인증키를 만들고 GIt hub 저장소에 배포키로 추가하면 된다.</p>
+<h3 id="ssh-key-생성" style="position:relative;"><a href="#ssh-key-%EC%83%9D%EC%84%B1" aria-label="ssh key 생성 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>ssh-key 생성</h3>
+<div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">ssh-keygen -t rsa -b 4096 -C &quot;your@email.com&quot;
+
+cat ~/.ssh/airflowsshkey.pub</code></pre></div>
+<h3 id="namespace-생성-후-valuesyaml-마무리" style="position:relative;"><a href="#namespace-%EC%83%9D%EC%84%B1-%ED%9B%84-valuesyaml-%EB%A7%88%EB%AC%B4%EB%A6%AC" aria-label="namespace 생성 후 valuesyaml 마무리 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>namespace 생성 후 values.yaml 마무리</h3>
+<div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">kubectl create namespace airflow
+
+kubectl create secret generic -n airflow airflow-git-ssh-secret \
+	--from-file=gitSshKey=$HOME/.ssh/airflowsshkey</code></pre></div>
+<p>그리고 아래 내용을 values.yaml 파일에 추가해준다.</p>
+<div class="gatsby-highlight" data-language="yaml"><pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">gitSync</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">repo</span><span class="token punctuation">:</span> &lt;본인 Repo ssh<span class="token punctuation">></span>
+    <span class="token key atrule">branch</span><span class="token punctuation">:</span> main
+    <span class="token key atrule">rev</span><span class="token punctuation">:</span> HEAD
+    <span class="token key atrule">depth</span><span class="token punctuation">:</span> <span class="token number">1</span>
+    <span class="token key atrule">maxFailures</span><span class="token punctuation">:</span> <span class="token number">0</span>
+    <span class="token key atrule">subPath</span><span class="token punctuation">:</span> <span class="token string">'dags'</span>
+    <span class="token key atrule">sshKeySecret</span><span class="token punctuation">:</span> airflow<span class="token punctuation">-</span>git<span class="token punctuation">-</span>ssh<span class="token punctuation">-</span>secret
+    <span class="token key atrule">knownHosts</span><span class="token punctuation">:</span> <span class="token punctuation">|</span><span class="token scalar string">
+      github.com ssh-rsa &lt;secret key></span></code></pre></div>
+<p>위 내용은 main 브렌치의 dags 폴더를 동기화하겠다는 단순한 뜻이다. <br>
+다만, 여기서 주의할 점이 ssh-rsa 다음에 오는 key는 방금 생성한 키가 아니라 GitHub 서버의 호스트 키를 말하는 것이다. 아래 공식문서를 잘 살펴보자</p>
+<ul>
+<li><a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints">GitHub의 SSH 키 Fingerprints 공식 문서</a></li>
+</ul>
+<h2 id="blob을-사용한-로그-저장" style="position:relative;"><a href="#blob%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%9C-%EB%A1%9C%EA%B7%B8-%EC%A0%80%EC%9E%A5" aria-label="blob을 사용한 로그 저장 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>blob을 사용한 로그 저장</h2>
+<p>다음은 로그 저장소를 설정하는 것이다. 보통 pv 및 pvc를 사용해서 저장한다. 나는 airflow라는 디렉토리를 만들어서 저장했다.</p>
+<h3 id="pv-logsyaml" style="position:relative;"><a href="#pv-logsyaml" aria-label="pv logsyaml permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>pv-logs.yaml</h3>
+<div class="gatsby-highlight" data-language="yaml"><pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> PersistentVolume
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> pv<span class="token punctuation">-</span>airflow<span class="token punctuation">-</span>logs
+  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+    <span class="token key atrule">type</span><span class="token punctuation">:</span> local
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">capacity</span><span class="token punctuation">:</span>
+    <span class="token key atrule">storage</span><span class="token punctuation">:</span> 5Gi
+  <span class="token key atrule">accessModes</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> ReadWriteMany
+  <span class="token key atrule">persistentVolumeReclaimPolicy</span><span class="token punctuation">:</span> Retain <span class="token comment"># If set as "Delete" container would be removed after pvc deletion</span>
+  <span class="token key atrule">storageClassName</span><span class="token punctuation">:</span> azureblob<span class="token punctuation">-</span>fuse<span class="token punctuation">-</span>premium
+  <span class="token key atrule">mountOptions</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token punctuation">-</span>o allow_other
+    <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>file<span class="token punctuation">-</span>cache<span class="token punctuation">-</span>timeout<span class="token punctuation">-</span>in<span class="token punctuation">-</span>seconds=120
+  <span class="token key atrule">csi</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> blob.csi.azure.com
+    <span class="token key atrule">readOnly</span><span class="token punctuation">:</span> <span class="token boolean important">false</span>
+    <span class="token key atrule">volumeHandle</span><span class="token punctuation">:</span> airflow<span class="token punctuation">-</span>logs<span class="token punctuation">-</span><span class="token number">1</span>
+    <span class="token key atrule">volumeAttributes</span><span class="token punctuation">:</span>
+      <span class="token key atrule">resourceGroup</span><span class="token punctuation">:</span> airflowrg
+      <span class="token key atrule">storageAccount</span><span class="token punctuation">:</span> airflowairflowsa
+      <span class="token key atrule">containerName</span><span class="token punctuation">:</span> airflow<span class="token punctuation">-</span>logs
+    <span class="token key atrule">nodeStageSecretRef</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> storage<span class="token punctuation">-</span>account<span class="token punctuation">-</span>credentials
+      <span class="token key atrule">namespace</span><span class="token punctuation">:</span> airflow</code></pre></div>
+<h3 id="pvc-logsyaml" style="position:relative;"><a href="#pvc-logsyaml" aria-label="pvc logsyaml permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>pvc-logs.yaml</h3>
+<div class="gatsby-highlight" data-language="yaml"><pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> PersistentVolumeClaim
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> pvc<span class="token punctuation">-</span>airflow<span class="token punctuation">-</span>logs
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">storageClassName</span><span class="token punctuation">:</span> azureblob<span class="token punctuation">-</span>fuse<span class="token punctuation">-</span>premium
+  <span class="token key atrule">accessModes</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> ReadWriteMany
+  <span class="token key atrule">resources</span><span class="token punctuation">:</span>
+    <span class="token key atrule">requests</span><span class="token punctuation">:</span>
+      <span class="token key atrule">storage</span><span class="token punctuation">:</span> 5Gi
+  <span class="token key atrule">volumeName</span><span class="token punctuation">:</span> pv<span class="token punctuation">-</span>airflow<span class="token punctuation">-</span>logs</code></pre></div>
+<p>PersistentVolume과 PersistentVolumeClaim을 프로비저닝 하는 코드를 짰으므로 당연히 해당 리소스에 대해서도 secret을 정의해주어야 한다. 아래 코드로 간단하게 만들 수 있다.</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">export</span> <span class="token assign-left variable">STORAGE_ACCOUNT_KEY</span><span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span>az storage account keys list <span class="token punctuation">\</span>
+        <span class="token parameter variable">-g</span> airflowrg <span class="token punctuation">\</span>
+        <span class="token parameter variable">-n</span> airflowairflowlogs <span class="token punctuation">\</span>
+        <span class="token parameter variable">--query</span> <span class="token string">'[0]'</span>.value <span class="token punctuation">\</span>
+        <span class="token parameter variable">-o</span> tsv<span class="token variable">)</span></span>
+
+kubectl create secret generic <span class="token parameter variable">-n</span> airflow storage-account-credentials <span class="token punctuation">\</span>
+	--from-literal <span class="token assign-left variable">azurestorageaccountname</span><span class="token operator">=</span>airflowairflowsa <span class="token punctuation">\</span>
+	--from-literal <span class="token assign-left variable">azurestorageaccountkey</span><span class="token operator">=</span><span class="token variable">$STORAGE_ACCOUNT_KEY</span> <span class="token punctuation">\</span>
+	<span class="token parameter variable">--type</span><span class="token operator">=</span>Opaque</code></pre></div>
+<p>그리고 적용해주자</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">kubectl apply <span class="token parameter variable">-n</span> airflow <span class="token parameter variable">-f</span> airflow/pv-logs.yaml
+kubectl apply <span class="token parameter variable">-n</span> airflow <span class="token parameter variable">-f</span> airflow/pvc-logs.yaml</code></pre></div>
+<h2 id="valuesyaml-파일-마무리" style="position:relative;"><a href="#valuesyaml-%ED%8C%8C%EC%9D%BC-%EB%A7%88%EB%AC%B4%EB%A6%AC" aria-label="valuesyaml 파일 마무리 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>values.yaml 파일 마무리</h2>
+<p>이제 설정 파일인 values.yaml파일을 마무리 해줄거다 여기서 logGroomerSidecar 부분은 전부 비활성화 처리 했다 Terraform 코드에서 blob 컨테이너에 대한 로그 정리 정책을 이미 정의했기 때문이다.</p>
+<div class="gatsby-highlight" data-language="yaml"><pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">logs</span><span class="token punctuation">:</span>
+  <span class="token key atrule">persistence</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">existingClaim</span><span class="token punctuation">:</span> pvc<span class="token punctuation">-</span>airflow<span class="token punctuation">-</span>logs
+    <span class="token key atrule">storageClassName</span><span class="token punctuation">:</span> azureblob<span class="token punctuation">-</span>fuse<span class="token punctuation">-</span>premium
+
+<span class="token comment"># We disable the log groomer sidecar because we use Azure Blob Storage for logs,</span>
+<span class="token comment"># where a lifecycle policy is already set</span>
+<span class="token key atrule">triggerer</span><span class="token punctuation">:</span>
+  <span class="token key atrule">logGroomerSidecar</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">false</span>
+
+<span class="token key atrule">scheduler</span><span class="token punctuation">:</span>
+  <span class="token key atrule">logGroomerSidecar</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">false</span>
+
+<span class="token key atrule">workers</span><span class="token punctuation">:</span>
+  <span class="token key atrule">logGroomerSidecar</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">false</span></code></pre></div>
+<h2 id="airflow-설치" style="position:relative;"><a href="#airflow-%EC%84%A4%EC%B9%98" aria-label="airflow 설치 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>airflow 설치</h2>
+<p>이제 설치 하자!</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">helm repo <span class="token function">add</span> apache-airflow https://airflow.apache.org
+
+helm <span class="token function">install</span> airflow apache-airflow/airflow <span class="token parameter variable">-n</span> airflow <span class="token parameter variable">-f</span> airflow/values.yaml <span class="token parameter variable">--debug</span>
+
+kubectl port-forward svc/airflow-webserver <span class="token number">8080</span>:8080 <span class="token parameter variable">-n</span> airflow</code></pre></div>
+<h2 id="test-build를-위해-acr에-이미지-등록하기" style="position:relative;"><a href="#test-build%EB%A5%BC-%EC%9C%84%ED%95%B4-acr%EC%97%90-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EB%93%B1%EB%A1%9D%ED%95%98%EA%B8%B0" aria-label="test build를 위해 acr에 이미지 등록하기 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>test build를 위해 ACR에 이미지 등록하기</h2>
+<p>우선 Hello World!가 출력되는 매우 간단한 컨테이너를 만들어 ACR에 업로드 해보자</p>
+<h3 id="dockerfile" style="position:relative;"><a href="#dockerfile" aria-label="dockerfile permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>DockerFile</h3>
+<div class="gatsby-highlight" data-language="dockerfile"><pre class="language-dockerfile"><code class="language-dockerfile"><span class="token instruction"><span class="token keyword">FROM</span> alpine:latest</span>
+
+<span class="token comment"># The command to run when the container starts</span>
+<span class="token instruction"><span class="token keyword">CMD</span> [<span class="token string">"echo"</span>, <span class="token string">"hello world"</span>]</span></code></pre></div>
+<div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">docker build -t example .
+docker run example</code></pre></div>
+<h3 id="docker-buildsh" style="position:relative;"><a href="#docker-buildsh" aria-label="docker buildsh permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>docker-build.sh</h3>
+<p>그 다음 acr에 로그인을 해준 후 ACR Portal에 있는 acr_id와 master key를 가져와준다. Portal에 가면 쉽게 확인이 가능하다.!</p>
+<div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">az acr login --name airflowacregistry</code></pre></div>
+<div class="gatsby-highlight" data-language="sh"><pre class="language-sh"><code class="language-sh"><span class="token assign-left variable">acr_id</span><span class="token operator">=</span><span class="token string">"airflowacregistry.azurecr.io"</span>
+<span class="token assign-left variable">image_name</span><span class="token operator">=</span><span class="token string">"aksdag"</span> <span class="token comment"># could be any image name</span>
+<span class="token function">docker</span> login <span class="token string">"<span class="token variable">$acr_id</span>"</span> <span class="token parameter variable">-u</span> <span class="token string">'&lt;ACR리소스 name>'</span> <span class="token parameter variable">-p</span> <span class="token string">"&lt;ACR master key>"</span>
+<span class="token function">docker</span> build <span class="token parameter variable">--tag</span> <span class="token string">"<span class="token variable">$acr_id</span>/<span class="token variable">$image_name</span>:latest"</span> <span class="token builtin class-name">.</span>
+<span class="token function">docker</span> push <span class="token string">"<span class="token variable">$acr_id</span>/<span class="token variable">$image_name</span>:latest"</span></code></pre></div>
+<p>아래 명령어로 이미지가 잘 ACR에 등록되었는지 확인도 가능하다</p>
+<div class="gatsby-highlight" data-language="zsh"><pre class="language-zsh"><code class="language-zsh">az acr repository list --name airflowacregistry --output table</code></pre></div>
+<h2 id="airflow에서-첫-번째-dag-실행" style="position:relative;"><a href="#airflow%EC%97%90%EC%84%9C-%EC%B2%AB-%EB%B2%88%EC%A7%B8-dag-%EC%8B%A4%ED%96%89" aria-label="airflow에서 첫 번째 dag 실행 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Airflow에서 첫 번째 DAG 실행</h2>
+<p>일단 아까전에 gitSync에서 적었던 git링크를 기억하는가?? 그 레포의 다음 경로에 들어가서 airflowsshkey.pub 안에 있는 키를 deploy key에 등록해준다.</p>
+<ul>
+<li><code class="language-text">Setting</code> -> <code class="language-text">DeployKey</code></li>
+</ul>
+<h3 id="dags-폴더에-dag-저장" style="position:relative;"><a href="#dags-%ED%8F%B4%EB%8D%94%EC%97%90-dag-%EC%A0%80%EC%9E%A5" aria-label="dags 폴더에 dag 저장 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>dags 폴더에 DAG 저장</h3>
+<p>ACR에 저장 했던 이미지를 빌드하는 코드이다.</p>
+<div class="gatsby-highlight" data-language="py"><pre class="language-py"><code class="language-py"><span class="token keyword">from</span> datetime <span class="token keyword">import</span> datetime
+<span class="token keyword">from</span> airflow <span class="token keyword">import</span> DAG
+<span class="token keyword">from</span> airflow<span class="token punctuation">.</span>contrib<span class="token punctuation">.</span>operators<span class="token punctuation">.</span>kubernetes_pod_operator <span class="token keyword">import</span> KubernetesPodOperator
+
+default_args <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"retries"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+    <span class="token string">"start_date"</span><span class="token punctuation">:</span> datetime<span class="token punctuation">(</span><span class="token number">2022</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token string">"image_pull_policy"</span><span class="token punctuation">:</span> <span class="token string">"Always"</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">with</span> DAG<span class="token punctuation">(</span>
+    dag_id<span class="token operator">=</span><span class="token string">"simple_kubernetes_dag"</span><span class="token punctuation">,</span>
+    schedule_interval<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span>
+    default_args<span class="token operator">=</span>default_args<span class="token punctuation">,</span>
+    catchup<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span>
+    tags<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"example"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    max_active_runs<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span> <span class="token keyword">as</span> dag<span class="token punctuation">:</span>
+    simple_task <span class="token operator">=</span> KubernetesPodOperator<span class="token punctuation">(</span>
+        task_id<span class="token operator">=</span><span class="token string">"simple_echo_task"</span><span class="token punctuation">,</span>
+        image<span class="token operator">=</span><span class="token string">"airflowacregistry.azurecr.io/example:latest"</span><span class="token punctuation">,</span>
+        name<span class="token operator">=</span><span class="token string">"simple-airflow-task"</span>
+    <span class="token punctuation">)</span></code></pre></div>
+<p>짠! 그럼 이제 아래 처럼 내가 만든 DAG가 무사히 airflow 내에 안착된것을 알 수 있다.ㅎㅎ</p>
+<div align="center">
+    <img src="https://1drv.ms/i/c/9ded56be8cf81c92/IQMLIOQC3j8iRZogFySybvL_Ae6JgpuQQ6AF8Oali7Wm9L0?width=1024" alt="airflow">
+</div>
+<p>DAG를 수동으로 트리거 하고 다음 메세지 까지 떴다면 완료다:)</p>
+<div class="gatsby-highlight" data-language="shell"><pre class="language-shell"><code class="language-shell"><span class="token punctuation">[</span><span class="token number">2024</span>-08-05, 08:36:51 UTC<span class="token punctuation">]</span> <span class="token punctuation">{</span>pod_manager.py:235<span class="token punctuation">}</span> INFO - hello world</code></pre></div>
+<h2 id="마무리-하며" style="position:relative;"><a href="#%EB%A7%88%EB%AC%B4%EB%A6%AC-%ED%95%98%EB%A9%B0" aria-label="마무리 하며 permalink" class="anchor before"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>마무리 하며..</h2>
+<p>완성했다!! 사실 더 고도화 하고 싶었는데 일단 현재 Azure Function 만드는데도 여러가지 이슈가 있기에 나중에 기회가 되면 argo CD 등으로 CI/CD 하는 것도 해보려구 한다. 점점 데엔에서 Devops 쪽을 건드리는 기분이지만 아무렴 재밌는데 뭐 어쩌겠는가</p>
+<p>위 코드에 대한 정보는 아래 나의 깃허브에 있다:) <br>
+<a href="https://github.com/StatisticsFox/terraform-aks-cluster-setup">terraform-aks-cluster-setup</a></p>
+<div class="table-of-contents">
+<ul>
+<li>
+<p><a href="#%EB%93%A4%EC%96%B4%EA%B0%80%EA%B8%B0%EC%97%90-%EC%95%9E%EC%84%9C">들어가기에 앞서</a></p>
+</li>
+<li>
+<p><a href="#prerequisites">Prerequisites</a></p>
+</li>
+<li>
+<p><a href="#terraform%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-aks-%EA%B5%AC%EC%84%B1">Terraform을 이용한 AKS 구성</a></p>
+<ul>
+<li><a href="#providerstf">providers.tf</a></li>
+<li><a href="#variablestf">variables.tf</a></li>
+<li><a href="#maintfvals">main.tfvals</a></li>
+<li><a href="#maintf">main.tf</a></li>
+</ul>
+</li>
+<li>
+<p><a href="#azure-%EC%9D%B8%ED%94%84%EB%9D%BC-%EB%B0%B0%ED%8F%AC%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%A3%BC%EC%B2%B4-%EC%83%9D%EC%84%B1">Azure 인프라 배포를 위한 서비스 주체 생성</a></p>
+</li>
+<li>
+<p><a href="#aks-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0-%EB%B0%B0%ED%8F%AC">AKS 클러스터 배포</a></p>
+</li>
+<li>
+<p><a href="#helm%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-airflow-%EC%84%A4%EC%B9%98">Helm을 사용하여 Airflow 설치</a></p>
+<ul>
+<li><a href="#valuesyaml">values.yaml</a></li>
+</ul>
+</li>
+<li>
+<p><a href="#dag%EB%A5%BC-%EB%8F%99%EA%B8%B0%ED%99%94%ED%95%98%EA%B8%B0-%EC%9C%84%ED%95%9C-gitsync">DAG를 동기화하기 위한 GitSync</a></p>
+<ul>
+<li><a href="#ssh-key-%EC%83%9D%EC%84%B1">ssh-key 생성</a></li>
+<li><a href="#namespace-%EC%83%9D%EC%84%B1-%ED%9B%84-valuesyaml-%EB%A7%88%EB%AC%B4%EB%A6%AC">namespace 생성 후 values.yaml 마무리</a></li>
+</ul>
+</li>
+<li>
+<p><a href="#blob%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%9C-%EB%A1%9C%EA%B7%B8-%EC%A0%80%EC%9E%A5">blob을 사용한 로그 저장</a></p>
+<ul>
+<li><a href="#pv-logsyaml">pv-logs.yaml</a></li>
+<li><a href="#pvc-logsyaml">pvc-logs.yaml</a></li>
+</ul>
+</li>
+<li>
+<p><a href="#valuesyaml-%ED%8C%8C%EC%9D%BC-%EB%A7%88%EB%AC%B4%EB%A6%AC">values.yaml 파일 마무리</a></p>
+</li>
+<li>
+<p><a href="#airflow-%EC%84%A4%EC%B9%98">airflow 설치</a></p>
+</li>
+<li>
+<p><a href="#test-build%EB%A5%BC-%EC%9C%84%ED%95%B4-acr%EC%97%90-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EB%93%B1%EB%A1%9D%ED%95%98%EA%B8%B0">test build를 위해 ACR에 이미지 등록하기</a></p>
+<ul>
+<li><a href="#dockerfile">DockerFile</a></li>
+<li><a href="#docker-buildsh">docker-build.sh</a></li>
+</ul>
+</li>
+<li>
+<p><a href="#airflow%EC%97%90%EC%84%9C-%EC%B2%AB-%EB%B2%88%EC%A7%B8-dag-%EC%8B%A4%ED%96%89">Airflow에서 첫 번째 DAG 실행</a></p>
+<ul>
+<li><a href="#dags-%ED%8F%B4%EB%8D%94%EC%97%90-dag-%EC%A0%80%EC%9E%A5">dags 폴더에 DAG 저장</a></li>
+</ul>
+</li>
+<li>
+<p><a href="#%EB%A7%88%EB%AC%B4%EB%A6%AC-%ED%95%98%EB%A9%B0">마무리 하며..</a></p>
+</li>
+</ul>
+</div></div></div><div class="post-navigator"><div class="post-navigator-card-wrapper"><a class="post-card prev" href="/Data Engineering/ETL의 T(transform)를 위한 Spark-Streaming 코드 작성하기/"><div class="direction">이전 글</div><div class="title">ETL의 T(transform)를 위한 Spark-Streaming 코드 작성하기</div></a></div><div class="post-navigator-card-wrapper"></div></div><div class="utterances"></div></main><footer class="page-footer-wrapper"><p class="page-footer">© <!-- -->2024<!-- --> <a href="https://github.com/StatisticsFox">최지혁</a> powered by<a href="https://github.com/zoomKoding/zoomkoding-gatsby-blog"> zoomkoding-gatsby-blog</a></p></footer><div class="dark-mode-button-wrapper"><button class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium dark-mode-button css-1yxmbwk" tabindex="0" type="button"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeLarge dark-mode-icon css-6flbmm" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="DarkModeIcon"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"></path></svg></button></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/Data Engineering/Terraform으로 AKS에 airflow 띄우고 git으로 DAG 관리하기/";window.___webpackCompilationHash="fea91093972dcd45132c";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-829f00f72e6d5357b90f.js"],"component---cache-caches-gatsby-plugin-offline-app-shell-js":["/component---cache-caches-gatsby-plugin-offline-app-shell-js-ffdb1e83dd2925d16ce3.js"],"component---src-pages-404-js":["/component---src-pages-404-js-3bebae4cd23a2ac27f64.js"],"component---src-pages-about-js":["/component---src-pages-about-js-7891d717b3031500827f.js"],"component---src-pages-index-js":["/component---src-pages-index-js-0800d3d1d708be393998.js"],"component---src-templates-blog-template-js":["/component---src-templates-blog-template-js-58e3f10c9ec0ccd684c3.js"],"component---src-templates-category-template-js":["/component---src-templates-category-template-js-9cdae21b8164b93e590c.js"]};/*]]>*/</script><script src="/app-829f00f72e6d5357b90f.js" async=""></script><script src="/framework-d0733d76d0cf1964327e.js" async=""></script><script src="/webpack-runtime-3e4dc00a5fc337c8dedf.js" async=""></script></body></html>
