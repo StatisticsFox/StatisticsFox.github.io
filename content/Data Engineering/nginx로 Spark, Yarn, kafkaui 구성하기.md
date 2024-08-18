@@ -1,6 +1,6 @@
 ---
 emoji: 🏓
-title: nginx로 Spark, Yarn, kafkaui 구성하기
+title: nginx로 Spark, Yarn, kafka 등 리소스 관리 Web ui 구성하기
 date: '2024-08-18 20:30:00'
 author: 최지혁
 tags: Data nginx
