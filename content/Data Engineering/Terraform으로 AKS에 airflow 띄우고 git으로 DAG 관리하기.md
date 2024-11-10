@@ -1,7 +1,7 @@
 ---
 emoji: 🍤
 title: Terraform으로 AKS에 airflow 띄우고 git으로 DAG 관리하기
-date: '2024-08-11 22:43:23'
+date: '2024-11-10 22:15:23'
 author: 최지혁
 tags: Data AKS Terraform GIT
 categories: Data_Engineering
