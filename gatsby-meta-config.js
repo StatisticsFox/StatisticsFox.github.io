@@ -1,6 +1,6 @@
 module.exports = {
-  title: `지혁이의 데엔일기`,
-  description: `지혁이의 데엔일기`,
+  title: `Insight Archive 🦊`, // Your blog title
+  description: `Insight Archive 🦊`,
   language: `ko`, // `ko`, `en` => currently support versions for Korean and English
   siteUrl: `https://statisticsfox.github.io/`,
   ogImage: `/og-image.png`, // Path to your in the 'static' folder
@@ -13,8 +13,8 @@ module.exports = {
   author: {
     name: `최지혁`,
     bio: {
-      role: `엔지니어`,
-      description: ['깨달음의 재미를 아는', '공유에 가치를 두는', '개방과 수용을 중시하는'],
+      role: `PM`,
+      description: ['소통에 재미를 느끼는', '공유에 가치를 두는', '개방과 수용을 중시하는'],
       thumbnail: 'Fox.png', // Path to the image in the 'asset' folder
     },
     social: {
